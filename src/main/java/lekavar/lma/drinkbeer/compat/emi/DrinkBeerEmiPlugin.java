@@ -13,9 +13,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.RecipeHolder;
 
 /**
- * Показывает рецепты варки в EMI. Апстримовский JEI-плагин выброшен — в клиент-паке
- * Kururun стоит EMI. Класс загружается только самим EMI, поэтому на сервере (и у клиентов
- * без EMI) он никогда не читается.
+ * Показывает рецепты варки в EMI. Апстримовский JEI-плагин выброшен — у нас в клиент-паке
+ * стоит EMI, а не JEI. Класс загружается только самим EMI, поэтому на сервере
+ * (и у клиентов без EMI) он никогда не читается.
  */
 @EmiEntrypoint
 public class DrinkBeerEmiPlugin implements EmiPlugin {

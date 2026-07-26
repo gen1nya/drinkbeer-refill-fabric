@@ -3,14 +3,14 @@
   "id": "drinkbeer",
   "version": "${version}",
   "name": "DrinkBeer Refill (Fabric)",
-  "description": "Brewing, Bartering and Bartending. Fabric-порт DrinkBeer Refill (NeoForge) для сервера Kururun.",
+  "description": "Brewing, Bartering and Bartending. Unofficial Fabric port of DrinkBeer Refill (NeoForge) with upstream bugfixes and an EMI plugin.",
   "authors": [
     "Lekavar",
     "MarbleGateKeeper",
     "DragonsPlusMinecraft"
   ],
   "contributors": [
-    "Kururun admins (Fabric port)"
+    "gen1nya (Fabric port)"
   ],
   "contact": {
     "sources": "https://github.com/gen1nya/drinkbeer-refill-fabric",

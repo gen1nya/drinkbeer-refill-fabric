@@ -1,7 +1,7 @@
 # Fabric-порт DrinkBeer Refill
 
 Форк [DragonsPlusMinecraft/DrinkBeerRefill](https://github.com/DragonsPlusMinecraft/DrinkBeerRefill)
-(ветка `1.21.1`, NeoForge) → Fabric 1.21.1 для сервера Kururun.
+(ветка `1.21.1`, NeoForge) → Fabric 1.21.1.
 
 - upstream remote: `upstream` (`git fetch upstream 1.21.1`)
 - рабочая ветка: `fabric-1.21.1`
@@ -166,7 +166,7 @@ trade box'е.
 
 ## Что выброшено
 
-- **JEI-плагин** (`compat/jei`) — в клиент-паке Kururun стоит **EMI**, не JEI. Вместо него
+- **JEI-плагин** (`compat/jei`) — у нас в клиент-паке **EMI**, не JEI. Вместо него
   написан свой EMI-плагин (см. ниже).
 - **Jade-интеграция** — в коде апстрима 1.21.1 её и не осталось (только депа в gradle).
 - Порядок креатив-табов (`withTabsBefore`) — метод только в NeoForge; табы на месте, но
