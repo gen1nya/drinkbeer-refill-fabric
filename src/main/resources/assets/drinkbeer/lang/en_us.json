@@ -96,14 +96,6 @@
   "drinkbeer.flavor.nutty1.tooltip": "Hunger + 5",
   "drinkbeer.flavor.mellow.tooltip": "Resistance 1:20",
   "drinkbeer.flavor.drying.tooltip": "Absorbs water in front of you",
-  "drinkbeer.jei.title.brewing": "Brewing",
-  "drinkbeer.jei.tooltip.brewing": "Brewing Time: ",
-  "drinkbeer.jei.tooltip.cup_slot": "The Cup Slot",
-  "drinkbeer.jei.tooltip.cup_1": "To Start Brewing, You Need Place ",
-  "drinkbeer.jei.tooltip.cup_2": " into Cup Slot.",
-  "config.jade.plugin_drinkbeer.beer_barrel": "Beer Barrel",
-  "config.jade.plugin_drinkbeer.trade_box": "Trade Box",
-  "config.jade.plugin_drinkbeer.mixed_beer": "Mixed Beer",
   "emi.category.drinkbeer.brewing": "Brewing",
   "drinkbeer.emi.brewing_time": "Brewing time: %s"
 }
