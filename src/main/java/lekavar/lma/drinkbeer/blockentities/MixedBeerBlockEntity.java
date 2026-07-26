@@ -2,6 +2,9 @@ package lekavar.lma.drinkbeer.blockentities;
 
 import lekavar.lma.drinkbeer.managers.MixedBeerManager;
 import lekavar.lma.drinkbeer.registries.BlockEntityRegistry;
+import lekavar.lma.drinkbeer.registries.DataComponentTypeRegistry;
+import lekavar.lma.drinkbeer.utils.dataComponent.SpiceData;
+import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
@@ -77,6 +80,45 @@ public class MixedBeerBlockEntity extends BlockEntity {
 
     public int getBeerId() {
         return beerId;
+    }
+
+    /**
+     * ФИКС ОТНОСИТЕЛЬНО АПСТРИМА: при установке коктейля на землю в блок-энтити никто не
+     * писал ни beerId, ни специи — апстримовский {@code MixedBeerBlockItem#placeBlock}
+     * только зовёт super, а конструктор с параметрами (pos, state, beerId, spiceList)
+     * не вызывается нигде. В итоге у поставленной кружки beerId = 0: рендерер подставлял
+     * generic-модель («кружка наебнулась»), а {@link #getPickStack()} возвращал коктейль
+     * с нулевым базовым пивом, который выглядел пустым, хотя пить его можно.
+     * <p>
+     * Реализуем штатный ванильный механизм: {@code BlockItem#place} после установки зовёт
+     * {@code BlockEntity#applyComponentsFromItemStack} и {@code setChanged()}, так что
+     * данные приезжают из компонентов предмета и сами уходят клиенту.
+     */
+    @Override
+    protected void applyImplicitComponents(DataComponentInput input) {
+        super.applyImplicitComponents(input);
+
+        Integer id = input.get(DataComponentTypeRegistry.BEER_ID_COMPONENT.get());
+        if (id != null) {
+            this.beerId = id;
+        }
+        SpiceData spices = input.get(DataComponentTypeRegistry.SPICE_COMPONENT.get());
+        if (spices != null) {
+            this.spiceList.clear();
+            for (int spice : new int[]{spices.spiceA(), spices.spiceB(), spices.spiceC()}) {
+                if (spice > 0) {
+                    this.spiceList.add(spice);
+                }
+            }
+        }
+    }
+
+    /** Обратный путь: middle-click по блоку и {@code saveToItem} дают корректный коктейль. */
+    @Override
+    protected void collectImplicitComponents(DataComponentMap.Builder builder) {
+        super.collectImplicitComponents(builder);
+        builder.set(DataComponentTypeRegistry.BEER_ID_COMPONENT.get(), this.beerId);
+        builder.set(DataComponentTypeRegistry.SPICE_COMPONENT.get(), SpiceData.fromSpiceList(this.spiceList));
     }
 
     @Nullable
