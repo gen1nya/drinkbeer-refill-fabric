@@ -2,7 +2,7 @@
 
 > **This is a modified fork.** It is an unofficial **Fabric 1.21.1** port of
 > [DragonsPlusMinecraft/DrinkBeerRefill](https://github.com/DragonsPlusMinecraft/DrinkBeerRefill)
-> (NeoForge, version `1.2.0`, commit `f3b2bfb`), made for the Kururun Minecraft server.
+> (NeoForge, version `1.2.0`, commit `f3b2bfb`).
 > The source has been changed relative to upstream: the loader layer was rewritten for Fabric,
 > six upstream bugs were fixed, the JEI plugin was replaced with an EMI plugin.
 >
