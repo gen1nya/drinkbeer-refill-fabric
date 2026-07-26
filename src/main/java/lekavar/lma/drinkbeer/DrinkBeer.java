@@ -2,31 +2,35 @@ package lekavar.lma.drinkbeer;
 
 import lekavar.lma.drinkbeer.networking.NetWorking;
 import lekavar.lma.drinkbeer.registries.*;
-import net.neoforged.bus.api.IEventBus;
-import net.neoforged.fml.common.Mod;
+import net.fabricmc.api.ModInitializer;
 
-@Mod(DrinkBeer.MOD_ID)
-public class DrinkBeer {
+public class DrinkBeer implements ModInitializer {
 
     public static final String MOD_ID = "drinkbeer";
 
-    public DrinkBeer(IEventBus modEventBus) {;
+    @Override
+    public void onInitialize() {
+        // На Fabric реестры открыты прямо здесь, поэтому регистрация происходит
+        // в статической инициализации *Registry-классов — её достаточно «разбудить».
+        // Порядок важен: блоки раньше предметов, потому что BlockItem'ам нужен готовый блок.
+        load(MobEffectRegistry.DRUNK);
+        load(BlockRegistry.BEER_BARREL);
+        load(ItemRegistry.BEER_BARREL);
+        load(BlockEntityRegistry.BEER_BARREL_TILEENTITY);
+        load(SoundEventRegistry.DRINKING_BEER);
+        load(MenuTypeRegistry.beerBarrelContainer);
+        load(RecipeRegistry.RECIPE_TYPE_BREWING);
+        load(RecipeRegistry.RECIPE_SERIALIZER_BREWING);
+        load(ParticleTypeRegistry.MIXED_BEER_DEFAULT);
+        load(CreativeTabRegistry.GENERAL);
+        load(CreativeTabRegistry.BEER);
+        load(DataComponentTypeRegistry.BEER_ID_COMPONENT);
 
-        MobEffectRegistry.STATUS_EFFECTS.register(modEventBus);
-        ItemRegistry.ITEMS.register(modEventBus);
-        BlockRegistry.BLOCKS.register(modEventBus);
-        BlockEntityRegistry.BLOKC_ENTITIES.register(modEventBus);
-        SoundEventRegistry.SOUNDS.register(modEventBus);
-        MenuTypeRegistry.MENUS.register(modEventBus);
-        RecipeRegistry.RECIPE_TYPES.register(modEventBus);
-        RecipeRegistry.RECIPE_SERIALIZERS.register(modEventBus);
-        ParticleTypeRegistry.PARTICLES.register(modEventBus);
-        CreativeTabRegistry.TABS.register(modEventBus);
-        DataComponentTypeRegistry.DATA_COMPONENTS.register(modEventBus);
+        NetWorking.init();
 
-        modEventBus.addListener(CapabilityRegistry::registerCapabilities);
-
-        modEventBus.addListener(NetWorking::init);
     }
 
+    /** Обращение к статическому полю форсит инициализацию класса-реестра. */
+    private static void load(Object registryEntry) {
+    }
 }

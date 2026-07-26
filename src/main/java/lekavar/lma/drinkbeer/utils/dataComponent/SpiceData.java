@@ -23,18 +23,27 @@ public record SpiceData(int spiceA, int spiceB, int spiceC) {
             SpiceData::new
     );
 
+    /**
+     * ФИКС ОТНОСИТЕЛЬНО АПСТРИМА: апстрим читает spiceList.get(1) и get(2) без проверки
+     * длины, поэтому первая же добавленная специя (список из 1 элемента) роняла тик
+     * с IndexOutOfBoundsException. Каскадная семантика сохранена: пустая специя
+     * обнуляет все последующие.
+     */
     public static SpiceData fromSpiceList(List<Integer> spiceList){
-        int a = 0, b = 0, c = 0;
-        if(spiceList.get(0)>0){
-            a = spiceList.get(0);
-            if(spiceList.get(1)>0){
-                b = spiceList.get(1);
-                if(spiceList.get(2)>0){
-                    c = spiceList.get(2);
-                }
-            }
+        int a = at(spiceList, 0), b = at(spiceList, 1), c = at(spiceList, 2);
+        if (a <= 0) {
+            b = 0;
+            c = 0;
+        } else if (b <= 0) {
+            c = 0;
         }
         return new SpiceData(a,b,c);
+    }
+
+    private static int at(List<Integer> spiceList, int index) {
+        if (index >= spiceList.size()) return 0;
+        Integer value = spiceList.get(index);
+        return value != null && value > 0 ? value : 0;
     }
 
 }

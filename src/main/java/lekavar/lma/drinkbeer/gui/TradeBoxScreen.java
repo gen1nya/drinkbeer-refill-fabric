@@ -4,7 +4,7 @@ import com.mojang.blaze3d.systems.RenderSystem;
 import lekavar.lma.drinkbeer.DrinkBeer;
 import lekavar.lma.drinkbeer.blocks.TradeboxBlock;
 import lekavar.lma.drinkbeer.managers.TradeBoxManager;
-import lekavar.lma.drinkbeer.networking.NetWorking;
+import lekavar.lma.drinkbeer.networking.client.ClientNetWorking;
 import lekavar.lma.drinkbeer.utils.Convert;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
@@ -46,8 +46,8 @@ public class TradeBoxScreen extends AbstractContainerScreen<TradeBoxMenu> {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
         RenderSystem.setShaderTexture(0, TRADE_BOX_GUI);
-        int backgroundWidth = this.getXSize();
-        int backgroundHeight = this.getYSize();
+        int backgroundWidth = this.imageWidth;
+        int backgroundHeight = this.imageHeight;
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
 
@@ -89,13 +89,13 @@ public class TradeBoxScreen extends AbstractContainerScreen<TradeBoxMenu> {
 
     @Override
     protected void init() {
-        int x = (width - getXSize()) / 2;
-        int y = (height - getYSize()) / 2;
+        int x = (width - this.imageWidth) / 2;
+        int y = (height - this.imageHeight) / 2;
         this.addRenderableWidget(new ImageButton(x + 156, y + 5, 16, 16, REFRESH_WIDGET_SPRITE, (buttonWidget) -> {
             if (container.isTrading()) {
                 BlockPos pos = getHitTradeBoxBlockPos();
                 if (pos != null)
-                    NetWorking.sendRefreshTradebox(pos);
+                    ClientNetWorking.sendRefreshTradebox(pos);
             }
         }));
         super.init();

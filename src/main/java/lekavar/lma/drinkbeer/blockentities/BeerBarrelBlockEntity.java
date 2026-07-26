@@ -2,6 +2,7 @@ package lekavar.lma.drinkbeer.blockentities;
 
 import lekavar.lma.drinkbeer.gui.BeerBarrelMenu;
 import lekavar.lma.drinkbeer.recipes.BrewingRecipe;
+import lekavar.lma.drinkbeer.recipes.BrewingRecipeInput;
 import lekavar.lma.drinkbeer.recipes.IBrewingInventory;
 import lekavar.lma.drinkbeer.registries.BlockEntityRegistry;
 import lekavar.lma.drinkbeer.registries.RecipeRegistry;
@@ -29,8 +30,10 @@ import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.ItemStackHandler;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.WorldlyContainer;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nonnull;
@@ -38,10 +41,11 @@ import javax.annotation.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class BeerBarrelBlockEntity extends BlockEntity implements MenuProvider {
+public class BeerBarrelBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory<BlockPos>, WorldlyContainer {
+
+    private static final int OUTPUT_SLOT = 5;
 
     private final BrewingInventory brewingInventory = new BrewingInventory(this);
-    public final IItemHandler itemHandler = new BarrelInvWrapper(this);
     private int remainingBrewTime;
     // 0 - waiting for ingredient, 1 - brewing, 2 - waiting for pickup product
     private int statusCode;
@@ -76,15 +80,16 @@ public class BeerBarrelBlockEntity extends BlockEntity implements MenuProvider {
     public void tickServer() {
         if (statusCode == 0) {
             if (brewingInventory.getIngredients().size() == 4) {
-                RecipeHolder<BrewingRecipe> recipeholder = level.getRecipeManager().getRecipeFor(RecipeRegistry.RECIPE_TYPE_BREWING.get(), brewingInventory, this.level).orElse(null);
+                IBrewingInventory recipeInput = new BrewingRecipeInput(brewingInventory);
+                RecipeHolder<BrewingRecipe> recipeholder = level.getRecipeManager().getRecipeFor(RecipeRegistry.RECIPE_TYPE_BREWING.get(), recipeInput, this.level).orElse(null);
                 if (recipeholder==null) {
                     clearResult();
                     return;
                 }
                 var recipe = recipeholder.value();
-                if (canBrew(recipe)) {
-                    displayResult(recipe);
-                    if (recipe.isCupQualified(brewingInventory)) {
+                if (canBrew(recipe, recipeInput)) {
+                    displayResult(recipe, recipeInput);
+                    if (recipe.isCupQualified(recipeInput)) {
                         for (int i = 0; i < 4; i++) {
                             ItemStack ingred = brewingInventory.getItem(i);
                             if (shouldReturnBucket(ingred)) brewingInventory.setItem(i, Items.BUCKET.getDefaultInstance());
@@ -118,8 +123,8 @@ public class BeerBarrelBlockEntity extends BlockEntity implements MenuProvider {
     }
 
 
-    private boolean canBrew(@Nullable BrewingRecipe recipe) {
-        return recipe.matches(brewingInventory, this.level);
+    private boolean canBrew(@Nullable BrewingRecipe recipe, IBrewingInventory recipeInput) {
+        return recipe.matches(recipeInput, this.level);
     }
 
     private boolean shouldReturnBucket(ItemStack item) {
@@ -134,10 +139,10 @@ public class BeerBarrelBlockEntity extends BlockEntity implements MenuProvider {
         }
     }
 
-    private void displayResult(BrewingRecipe recipe) {
-        var result = recipe.assemble(brewingInventory, level.registryAccess());
+    private void displayResult(BrewingRecipe recipe, IBrewingInventory recipeInput) {
+        var result = recipe.assemble(recipeInput, level.registryAccess());
         if (!ItemStack.matches(result, brewingInventory.getItem(5))) {
-            brewingInventory.setItem(5, recipe.assemble(brewingInventory, level.registryAccess()));
+            brewingInventory.setItem(5, recipe.assemble(recipeInput, level.registryAccess()));
             remainingBrewTime = recipe.getBrewingTime();
             updateBE();
         }
@@ -167,6 +172,8 @@ public class BeerBarrelBlockEntity extends BlockEntity implements MenuProvider {
         super.loadAdditional(tag,registries);
         this.remainingBrewTime = tag.getInt("RemainingBrewTime");
         this.statusCode = tag.getInt("statusCode");
+        // чистим перед загрузкой — loadAllItems снятые предметы не убирает (см. стол)
+        brewingInventory.clearContent();
         ContainerHelper.loadAllItems(tag, brewingInventory.getItems(),registries);
     }
 
@@ -182,9 +189,80 @@ public class BeerBarrelBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider registries) {
-        super.onDataPacket(net,pkt,registries);
-        handleUpdateTag(pkt.getTag(),registries);
+    public BlockPos getScreenOpeningData(ServerPlayer player) {
+        return getBlockPos();
+    }
+
+    // ─── Автоматизация ──────────────────────────────────────────────────────────
+    // Апстрим отдаёт хопперам IItemHandler (BarrelInvWrapper): виден только слот
+    // результата (5), забирать можно лишь когда statusCode == 2, кладут — никогда.
+    // На Fabric ровно та же семантика выражается через WorldlyContainer, который
+    // понимают и ванильные хопперы, и Transfer API.
+
+    @Override
+    public int[] getSlotsForFace(@NotNull Direction side) {
+        return new int[]{OUTPUT_SLOT};
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int index, @NotNull ItemStack stack, @Nullable Direction direction) {
+        return false;
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int index, @NotNull ItemStack stack, @NotNull Direction direction) {
+        return index == OUTPUT_SLOT && statusCode == 2;
+    }
+
+    @Override
+    public boolean canPlaceItem(int index, @NotNull ItemStack stack) {
+        return false;
+    }
+
+    @Override
+    public int getContainerSize() {
+        return brewingInventory.getContainerSize();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return brewingInventory.isEmpty();
+    }
+
+    @NotNull
+    @Override
+    public ItemStack getItem(int index) {
+        // Пока варка не закончена, результат для автоматизации не существует.
+        if (index == OUTPUT_SLOT && statusCode != 2) return ItemStack.EMPTY;
+        return brewingInventory.getItem(index);
+    }
+
+    @NotNull
+    @Override
+    public ItemStack removeItem(int index, int count) {
+        if (index == OUTPUT_SLOT && statusCode != 2) return ItemStack.EMPTY;
+        return brewingInventory.removeItem(index, count);
+    }
+
+    @NotNull
+    @Override
+    public ItemStack removeItemNoUpdate(int index) {
+        return brewingInventory.removeItemNoUpdate(index);
+    }
+
+    @Override
+    public void setItem(int index, @NotNull ItemStack stack) {
+        brewingInventory.setItem(index, stack);
+    }
+
+    @Override
+    public boolean stillValid(@NotNull Player player) {
+        return brewingInventory.stillValid(player);
+    }
+
+    @Override
+    public void clearContent() {
+        brewingInventory.clearContent();
     }
 
     @Nullable
@@ -200,13 +278,11 @@ public class BeerBarrelBlockEntity extends BlockEntity implements MenuProvider {
         return tag;
     }
 
-    @Override
-    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
-        super.handleUpdateTag(tag,registries);
-        ContainerHelper.loadAllItems(tag, brewingInventory.getItems(),registries);
-    }
-
-    public static class BrewingInventory extends SimpleContainer implements IBrewingInventory {
+    /**
+     * Хранилище кега. Сознательно НЕ реализует IBrewingInventory (RecipeInput) —
+     * см. комментарий в {@link BrewingRecipeInput}: на Fabric это ломает ремаппинг.
+     */
+    public static class BrewingInventory extends SimpleContainer {
         BeerBarrelBlockEntity be;
 
         public BrewingInventory(BeerBarrelBlockEntity be) {
@@ -215,7 +291,6 @@ public class BeerBarrelBlockEntity extends BlockEntity implements MenuProvider {
         }
 
         @NotNull
-        @Override
         public List<ItemStack> getIngredients() {
             List<ItemStack> ret = new ArrayList<>();
             if (isEmpty()) return ret;
@@ -226,7 +301,6 @@ public class BeerBarrelBlockEntity extends BlockEntity implements MenuProvider {
         }
 
         @NotNull
-        @Override
         public ItemStack getCup() {
             return getItem(4);
         }
@@ -244,66 +318,6 @@ public class BeerBarrelBlockEntity extends BlockEntity implements MenuProvider {
             } else {
                 return !(pPlayer.distanceToSqr((double) be.worldPosition.getX() + 0.5D, (double) be.worldPosition.getY() + 0.5D, (double) be.worldPosition.getZ() + 0.5D) > 64.0D);
             }
-        }
-
-        @Override
-        public int size() {
-            return 6;
-        }
-    }
-
-    static class BarrelInvWrapper extends ItemStackHandler {
-
-        private BrewingInventory brewingInventory;
-        private BeerBarrelBlockEntity be;
-
-        public BarrelInvWrapper(BeerBarrelBlockEntity be) {
-            this.brewingInventory = be.brewingInventory;
-            this.be = be;
-        }
-
-        @Override
-        public void setStackInSlot(int slot, @NotNull ItemStack stack) {
-            // Well I do want to do nothing here but....
-            brewingInventory.setItem(5, stack);
-        }
-
-        @Override
-        public int getSlots() {
-            return 1;
-        }
-
-        @Override
-        public @NotNull ItemStack getStackInSlot(int slot) {
-            if (be.statusCode != 2) return ItemStack.EMPTY;
-            return brewingInventory.getItem(5);
-        }
-
-        @Override
-        public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
-            return stack;
-        }
-
-        @Override
-        public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
-            if (be.statusCode != 2) return ItemStack.EMPTY;
-            var ret = brewingInventory.getItem(5).copy();
-            amount = Math.min(ret.getCount(), amount);
-            ret.setCount(amount);
-            if (!simulate) {
-                brewingInventory.getItem(5).shrink(amount);
-            }
-            return ret;
-        }
-
-        @Override
-        public int getSlotLimit(int slot) {
-            return 64;
-        }
-
-        @Override
-        public boolean isItemValid(int slot, @NotNull ItemStack stack) {
-            return false;
         }
     }
 

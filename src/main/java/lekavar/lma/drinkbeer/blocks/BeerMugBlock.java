@@ -26,7 +26,6 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.neoforged.neoforge.items.ItemHandlerHelper;
 
 import javax.annotation.Nullable;
 
@@ -72,7 +71,7 @@ public class BeerMugBlock extends Block {
     protected InteractionResult useWithoutItem(BlockState state, Level world, BlockPos pos, Player player, BlockHitResult hitResult) {
         if(!world.isClientSide()){
             ItemStack takeBackBeer = state.getBlock().asItem().getDefaultInstance();
-            ItemHandlerHelper.giveItemToPlayer(player, takeBackBeer);
+            player.getInventory().placeItemBackInInventory(takeBackBeer);
             int amount = state.getValue(AMOUNT);
             switch (amount) {
                 case 3:

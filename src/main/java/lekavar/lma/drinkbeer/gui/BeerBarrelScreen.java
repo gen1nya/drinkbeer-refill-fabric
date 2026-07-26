@@ -28,8 +28,8 @@ public class BeerBarrelScreen extends AbstractContainerScreen<BeerBarrelMenu> {
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         RenderSystem.setShaderTexture(0, BEER_BARREL_CONTAINER_RESOURCE);
-        int i = (this.width - this.getXSize()) / 2;
-        int j = (this.height - this.getYSize()) / 2;
+        int i = (this.width - this.imageWidth) / 2;
+        int j = (this.height - this.imageHeight) / 2;
         guiGraphics.blit(BEER_BARREL_CONTAINER_RESOURCE, i, j, 0, 0, imageWidth, imageHeight);
     }
 
@@ -44,7 +44,7 @@ public class BeerBarrelScreen extends AbstractContainerScreen<BeerBarrelMenu> {
         guiGraphics.drawCenteredString(this.font, this.title, (int) this.textureWidth / 2, (int) this.titleLabelY, 4210752);
         guiGraphics.drawString(this.font, this.inventory.getDisplayName(), this.inventoryLabelX, this.inventoryLabelY, 4210752, false);
         String str = menu.getIsBrewing() ? convertTickToTime(menu.getRemainingBrewingTime()) : convertTickToTime(menu.getStandardBrewingTime());
-        guiGraphics.drawString(this.font, str, (float) 128, (float) 54, new Color(64, 64, 64, 255).getRGB(), false);
+        guiGraphics.drawString(this.font, str, 128, 54, new Color(64, 64, 64, 255).getRGB(), false);
     }
 
     public String convertTickToTime(int tick) {

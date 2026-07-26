@@ -1,0 +1,39 @@
+{
+  "schemaVersion": 1,
+  "id": "drinkbeer",
+  "version": "${version}",
+  "name": "DrinkBeer Refill (Fabric)",
+  "description": "Brewing, Bartering and Bartending. Fabric-порт DrinkBeer Refill (NeoForge) для сервера Kururun.",
+  "authors": [
+    "Lekavar",
+    "MarbleGateKeeper",
+    "DragonsPlusMinecraft"
+  ],
+  "contributors": [
+    "Kururun admins (Fabric port)"
+  ],
+  "contact": {
+    "sources": "https://github.com/gen1nya/drinkbeer-refill-fabric",
+    "homepage": "https://github.com/DragonsPlusMinecraft/DrinkBeerRefill"
+  },
+  "license": "AGPL-3.0-only",
+  "icon": "icon.png",
+  "environment": "*",
+  "entrypoints": {
+    "main": [
+      "lekavar.lma.drinkbeer.DrinkBeer"
+    ],
+    "client": [
+      "lekavar.lma.drinkbeer.DrinkBeerClient"
+    ]
+  },
+  "depends": {
+    "fabricloader": ">=0.19.0",
+    "minecraft": "~1.21.1",
+    "java": ">=21",
+    "fabric-api": "*"
+  },
+  "suggests": {
+    "emi": "*"
+  }
+}

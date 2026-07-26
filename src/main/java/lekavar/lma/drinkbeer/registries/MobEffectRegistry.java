@@ -6,12 +6,12 @@ import lekavar.lma.drinkbeer.effects.DrunkStatusEffect;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.world.effect.MobEffect;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import lekavar.lma.drinkbeer.fabric.DeferredRegister;
 
 
 public class MobEffectRegistry {
     public static final DeferredRegister<MobEffect> STATUS_EFFECTS = DeferredRegister.create(Registries.MOB_EFFECT, DrinkBeer.MOD_ID);
-    public static final Holder<MobEffect> DRUNK_FROST_WALKER = STATUS_EFFECTS.register("drunk_frost_walker", DrunkFrostWalkerStatusEffect::new);
-    public static final Holder<MobEffect> DRUNK = STATUS_EFFECTS.register("drunk", DrunkStatusEffect::new);
+    public static final Holder<MobEffect> DRUNK_FROST_WALKER = STATUS_EFFECTS.registerForHolder("drunk_frost_walker", DrunkFrostWalkerStatusEffect::new);
+    public static final Holder<MobEffect> DRUNK = STATUS_EFFECTS.registerForHolder("drunk", DrunkStatusEffect::new);
 }
 

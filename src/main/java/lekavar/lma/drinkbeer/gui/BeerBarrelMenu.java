@@ -4,9 +4,7 @@ import lekavar.lma.drinkbeer.blockentities.BeerBarrelBlockEntity;
 import lekavar.lma.drinkbeer.registries.ItemRegistry;
 import lekavar.lma.drinkbeer.registries.MenuTypeRegistry;
 import lekavar.lma.drinkbeer.registries.SoundEventRegistry;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
@@ -16,9 +14,6 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.ItemStack;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
 
 public class BeerBarrelMenu extends AbstractContainerMenu {
     private static final int STATUS_CODE = 1;
@@ -33,7 +28,7 @@ public class BeerBarrelMenu extends AbstractContainerMenu {
 
         // Layout Slot
         // Player Inventory
-        layoutPlayerInventorySlots(8, 84, new InvWrapper(playerInventory));
+        layoutPlayerInventorySlots(8, 84, playerInventory);
         // Input Ingredients
         addSlot(new Slot(brewingSpace, 0, 28, 26));
         addSlot(new Slot(brewingSpace, 1, 46, 26));
@@ -48,24 +43,25 @@ public class BeerBarrelMenu extends AbstractContainerMenu {
         addDataSlots(syncData);
     }
 
-    public BeerBarrelMenu(int id, Inventory playerInventory, FriendlyByteBuf data) {
-        this(id, playerInventory, data.readBlockPos());
-    }
-
+    /** Клиентский конструктор: BlockPos приходит из ExtendedScreenHandlerType. */
     public BeerBarrelMenu(int id, Inventory playerInventory, BlockPos pos) {
-        this(id, ((BeerBarrelBlockEntity) Minecraft.getInstance().level.getBlockEntity(pos)).getBrewingInventory(), ((BeerBarrelBlockEntity) Minecraft.getInstance().level.getBlockEntity(pos)).syncData, playerInventory, ((BeerBarrelBlockEntity) Minecraft.getInstance().level.getBlockEntity(pos)));
+        this(id, (BeerBarrelBlockEntity) playerInventory.player.level().getBlockEntity(pos), playerInventory);
     }
 
-    private int addSlotRange(IItemHandler handler, int index, int x, int y, int amount, int dx) {
+    private BeerBarrelMenu(int id, BeerBarrelBlockEntity be, Inventory playerInventory) {
+        this(id, be.getBrewingInventory(), be.syncData, playerInventory, be);
+    }
+
+    private int addSlotRange(Container handler, int index, int x, int y, int amount, int dx) {
         for (int i = 0; i < amount; i++) {
-            addSlot(new SlotItemHandler(handler, index, x, y));
+            addSlot(new Slot(handler, index, x, y));
             x += dx;
             index++;
         }
         return index;
     }
 
-    private int addSlotBox(IItemHandler handler, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
+    private int addSlotBox(Container handler, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
         for (int j = 0; j < verAmount; j++) {
             index = addSlotRange(handler, index, x, y, horAmount, dx);
             y += dy;
@@ -73,7 +69,7 @@ public class BeerBarrelMenu extends AbstractContainerMenu {
         return index;
     }
 
-    private void layoutPlayerInventorySlots(int leftCol, int topRow, IItemHandler playerInventory) {
+    private void layoutPlayerInventorySlots(int leftCol, int topRow, Container playerInventory) {
         // Player inventory
         addSlotBox(playerInventory, 9, leftCol, topRow, 9, 18, 3, 18);
 

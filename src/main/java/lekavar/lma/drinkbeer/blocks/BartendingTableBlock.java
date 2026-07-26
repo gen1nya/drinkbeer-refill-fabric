@@ -110,8 +110,19 @@ public class BartendingTableBlock extends BaseEntityBlock {
 
     @Override
     protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+        ItemStack inHand = player.getItemInHand(hand);
+        boolean handledItem = inHand.getItem() instanceof MixedBeerBlockItem
+                || inHand.getItem() instanceof BeerMugItem
+                || inHand.getItem() instanceof SpiceBlockItem;
+        if (!handledItem) {
+            // ФИКС ОТНОСИТЕЛЬНО АПСТРИМА: ваниль зовёт сначала useItemOn и только при
+            // PASS_TO_DEFAULT_BLOCK_INTERACTION переходит к useWithoutItem. Апстрим
+            // возвращал здесь CONSUME для ЛЮБОГО предмета, включая пустую руку, поэтому
+            // клик съедался и забрать кружку со стола было невозможно в принципе.
+            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+        }
         if (!world.isClientSide()) {
-            ItemStack itemStack = player.getItemInHand(hand);
+            ItemStack itemStack = inHand;
             BlockEntity blockentity = world.getBlockEntity(pos);
             if (blockentity instanceof BartendingTableBlockEntity bartendingTableBlockEntity) {
                 if (itemStack.getItem() instanceof MixedBeerBlockItem || itemStack.getItem() instanceof BeerMugItem) {

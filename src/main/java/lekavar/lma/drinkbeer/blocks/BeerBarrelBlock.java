@@ -88,7 +88,7 @@ public class BeerBarrelBlock extends BaseEntityBlock {
 
             BlockEntity blockentity = world.getBlockEntity(pos);
             if (blockentity instanceof BeerBarrelBlockEntity) {
-                player.openMenu((BeerBarrelBlockEntity) blockentity, buf -> buf.writeBlockPos(blockentity.getBlockPos()));
+                player.openMenu((BeerBarrelBlockEntity) blockentity);
             }
             return InteractionResult.CONSUME;
 

@@ -12,6 +12,8 @@ import lekavar.lma.drinkbeer.utils.mixedbeer.Flavors;
 import lekavar.lma.drinkbeer.utils.mixedbeer.MixedBeerOnUsing;
 import lekavar.lma.drinkbeer.utils.mixedbeer.Spices;
 import net.minecraft.core.Holder;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
@@ -37,9 +39,9 @@ public class MixedBeerManager {
 
     public static ItemStack genMixedBeerItemStack(int beerId, List<Integer> spiceList) {
         ItemStack resultStack = new ItemStack(ItemRegistry.MIXED_BEER.get(), 1);
-        resultStack.set(DataComponentTypeRegistry.BEER_ID_COMPONENT,beerId);
+        resultStack.set(DataComponentTypeRegistry.BEER_ID_COMPONENT.get(),beerId);
         spiceList = removeIllegalSpiceId(spiceList);
-        resultStack.set(DataComponentTypeRegistry.SPICE_COMPONENT,SpiceData.fromSpiceList(spiceList));
+        resultStack.set(DataComponentTypeRegistry.SPICE_COMPONENT.get(),SpiceData.fromSpiceList(spiceList));
         return resultStack;
     }
 
@@ -51,7 +53,7 @@ public class MixedBeerManager {
 
     public static int getBeerId(ItemStack itemStack) {
         if (itemStack.getItem() instanceof MixedBeerBlockItem) {
-            return itemStack.get(DataComponentTypeRegistry.BEER_ID_COMPONENT);
+            return itemStack.get(DataComponentTypeRegistry.BEER_ID_COMPONENT.get());
         }
         return Beers.EMPTY_BEER_ID;
     }
@@ -59,7 +61,7 @@ public class MixedBeerManager {
     public static List<Integer> getSpiceList(ItemStack itemStack) {
         List<Integer> spiceList = new ArrayList<>();
         if (itemStack.getItem() instanceof MixedBeerBlockItem) {
-            var data = itemStack.get(DataComponentTypeRegistry.SPICE_COMPONENT);
+            var data = itemStack.get(DataComponentTypeRegistry.SPICE_COMPONENT.get());
             if(data.spiceA()>0){
                 spiceList.add(data.spiceA());
                 if(data.spiceB()>0){
@@ -73,8 +75,9 @@ public class MixedBeerManager {
         return spiceList;
     }
 
+    /** Полный ключ локализации «звёздочки» коктейля: block.drinkbeer.mixed_beer. */
     public static String getMixedBeerTranslationKey() {
-        return ItemRegistry.MIXED_BEER.get().asItem().toString();
+        return ItemRegistry.MIXED_BEER.get().getDescriptionId();
     }
 
     public static String getBaseBeerToolTipTranslationKey() {
@@ -92,7 +95,7 @@ public class MixedBeerManager {
         //Initialize beer
         mixedBeerOnUsing.setBeer(Beers.byId(getBeerId(stack)));
         //Initialize food level
-        mixedBeerOnUsing.addHunger(Objects.requireNonNull(mixedBeerOnUsing.getBeerItem().getFoodProperties(stack,null).nutrition()));
+        mixedBeerOnUsing.addHunger(Objects.requireNonNull(mixedBeerOnUsing.getBeerItem().components().get(DataComponents.FOOD).nutrition()));
         //Initialize spices and flavors
         List<Integer> spiceList = getSpiceList(stack);
         mixedBeerOnUsing.setSpiceList(spiceList);
@@ -134,7 +137,13 @@ public class MixedBeerManager {
         }
         //Apply status effects
         for (Pair<MobEffect, Integer> statusEffectPair : mixedBeerOnUsing.getStatusEffectList()) {
-            user.addEffect(new MobEffectInstance(Holder.direct(statusEffectPair.getKey()), statusEffectPair.getValue()));
+            // ФИКС ОТНОСИТЕЛЬНО АПСТРИМА: тут было Holder.direct(...). Прямой холдер не
+            // принадлежит реестру, и ванильный кодек MobEffectInstance#save падает на нём
+            // (IllegalStateException: Unregistered holder) — игра крашилась при первом же
+            // сохранении игрока после коктейля. Берём холдер из реестра.
+            user.addEffect(new MobEffectInstance(
+                    BuiltInRegistries.MOB_EFFECT.wrapAsHolder(statusEffectPair.getKey()),
+                    statusEffectPair.getValue()));
         }
         //Apply flavor actions
         SpiceAndFlavorManager.applyFlavorAction(mixedBeerOnUsing, world, user);
@@ -142,7 +151,7 @@ public class MixedBeerManager {
 
     private static List<Pair<MobEffect, Integer>> getBeerStatusEffectList(ItemStack stack, Level world) {
         List<Pair<MobEffect, Integer>> resultStatusEffectList = new ArrayList<>();
-        List<FoodProperties.PossibleEffect> possibleEffects = stack.getFoodProperties(null).effects();
+        List<FoodProperties.PossibleEffect> possibleEffects = stack.get(DataComponents.FOOD).effects();
         if (possibleEffects != null) {
             if (!possibleEffects.isEmpty()) {
                 for (FoodProperties.PossibleEffect possibleEffect : possibleEffects)

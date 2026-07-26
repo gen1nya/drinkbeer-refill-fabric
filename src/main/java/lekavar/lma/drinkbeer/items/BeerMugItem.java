@@ -3,6 +3,7 @@ package lekavar.lma.drinkbeer.items;
 import lekavar.lma.drinkbeer.effects.DrunkStatusEffect;
 import lekavar.lma.drinkbeer.effects.NightHowlStatusEffect;
 import net.minecraft.ChatFormatting;
+import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -42,7 +43,7 @@ public class BeerMugItem extends BeerBlockItem {
     public BeerMugItem(Block block, Supplier<MobEffectInstance> statusEffectInstance, int nutrition, boolean hasExtraTooltip) {
         super(block, new Item.Properties().stacksTo(16)
                 .food(statusEffectInstance != null
-                        ? new FoodProperties.Builder().nutrition(nutrition).effect(statusEffectInstance, 1).alwaysEdible().build()
+                        ? new FoodProperties.Builder().nutrition(nutrition).effect(statusEffectInstance.get(), 1).alwaysEdible().build()
                         : new FoodProperties.Builder().nutrition(nutrition).alwaysEdible().build()));
         this.hasExtraTooltip = hasExtraTooltip;
     }
@@ -62,7 +63,7 @@ public class BeerMugItem extends BeerBlockItem {
         if (hasEffectNoticeTooltip()) {
             tooltipComponents.add(Component.translatable("item.drinkbeer." + name + ".tooltip").setStyle(Style.EMPTY.applyFormat(ChatFormatting.BLUE)));
         }
-        String hunger = String.valueOf(stack.getItem().getFoodProperties(stack,null).nutrition());
+        String hunger = String.valueOf(stack.get(DataComponents.FOOD).nutrition());
         tooltipComponents.add(Component.translatable("drinkbeer.restores_hunger").setStyle(Style.EMPTY.applyFormat(ChatFormatting.BLUE)).append(hunger));
     }
 

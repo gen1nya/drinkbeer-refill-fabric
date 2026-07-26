@@ -4,7 +4,7 @@ import lekavar.lma.drinkbeer.DrinkBeer;
 import net.minecraft.core.registries.Registries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.sounds.SoundEvent;
-import net.neoforged.neoforge.registries.DeferredRegister;
+import lekavar.lma.drinkbeer.fabric.DeferredRegister;
 
 import java.util.function.Supplier;
 

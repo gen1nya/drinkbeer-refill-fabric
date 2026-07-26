@@ -9,9 +9,7 @@ import lekavar.lma.drinkbeer.utils.tradebox.Good;
 import lekavar.lma.drinkbeer.utils.tradebox.Locations;
 import lekavar.lma.drinkbeer.utils.tradebox.Residents;
 import lekavar.lma.drinkbeer.utils.tradebox.TradeMission;
-import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
@@ -23,9 +21,6 @@ import net.minecraft.world.inventory.Slot;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
-import net.neoforged.neoforge.items.IItemHandler;
-import net.neoforged.neoforge.items.SlotItemHandler;
-import net.neoforged.neoforge.items.wrapper.InvWrapper;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -51,12 +46,13 @@ public class TradeBoxMenu extends AbstractContainerMenu {
 
     private BlockPos pos;
 
-    public TradeBoxMenu(int id, Inventory playerInventory, FriendlyByteBuf data) {
-        this(id, playerInventory, data.readBlockPos());
+    /** Клиентский конструктор: BlockPos приходит из ExtendedScreenHandlerType. */
+    public TradeBoxMenu(int id, Inventory playerInventory, BlockPos pos) {
+        this(id, (TradeBoxBlockEntity) playerInventory.player.level().getBlockEntity(pos), playerInventory);
     }
 
-    public TradeBoxMenu(int id, Inventory playerInventory, BlockPos pos) {
-        this(id, ((TradeBoxBlockEntity) Minecraft.getInstance().level.getBlockEntity(pos)).goodInventory, ((TradeBoxBlockEntity) Minecraft.getInstance().level.getBlockEntity(pos)).syncData, playerInventory, ((TradeBoxBlockEntity) Minecraft.getInstance().level.getBlockEntity(pos)));
+    private TradeBoxMenu(int id, TradeBoxBlockEntity be, Inventory playerInventory) {
+        this(id, be.goodInventory, be.syncData, playerInventory, be);
     }
 
     public TradeBoxMenu(int id, Container goodInventory, ContainerData syncData, Inventory playerInventory, TradeBoxBlockEntity tradeBoxBlockEntity) {
@@ -102,7 +98,7 @@ public class TradeBoxMenu extends AbstractContainerMenu {
                 }));
 
         // Player Inventory
-        layoutPlayerInventorySlots(8, 84, new InvWrapper(playerInventory));
+        layoutPlayerInventorySlots(8, 84, playerInventory);
 
         //Generate trade mission if tradebox is in trading process but has illegal trade mission
         if (isTrading() && !hasLegalTradeMission()) {
@@ -113,16 +109,16 @@ public class TradeBoxMenu extends AbstractContainerMenu {
         addDataSlots(syncData);
     }
 
-    private int addSlotRange(IItemHandler handler, int index, int x, int y, int amount, int dx) {
+    private int addSlotRange(Container handler, int index, int x, int y, int amount, int dx) {
         for (int i = 0; i < amount; i++) {
-            addSlot(new SlotItemHandler(handler, index, x, y));
+            addSlot(new Slot(handler, index, x, y));
             x += dx;
             index++;
         }
         return index;
     }
 
-    private int addSlotBox(IItemHandler handler, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
+    private int addSlotBox(Container handler, int index, int x, int y, int horAmount, int dx, int verAmount, int dy) {
         for (int j = 0; j < verAmount; j++) {
             index = addSlotRange(handler, index, x, y, horAmount, dx);
             y += dy;
@@ -130,7 +126,7 @@ public class TradeBoxMenu extends AbstractContainerMenu {
         return index;
     }
 
-    private void layoutPlayerInventorySlots(int leftCol, int topRow, IItemHandler playerInventory) {
+    private void layoutPlayerInventorySlots(int leftCol, int topRow, Container playerInventory) {
         // Player inventory
         addSlotBox(playerInventory, 9, leftCol, topRow, 9, 18, 3, 18);
 

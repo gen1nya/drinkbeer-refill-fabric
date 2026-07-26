@@ -10,7 +10,8 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.ContainerHelper;
-import net.minecraft.world.MenuProvider;
+import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
@@ -24,7 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
-public class TradeBoxBlockEntity extends BlockEntity implements MenuProvider {
+public class TradeBoxBlockEntity extends BlockEntity implements ExtendedScreenHandlerFactory<BlockPos> {
     public SimpleContainer goodInventory = new SimpleContainer(8);
     private int coolingTime;
     private int locationId;
@@ -108,6 +109,11 @@ public class TradeBoxBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
+    public BlockPos getScreenOpeningData(ServerPlayer player) {
+        return getBlockPos();
+    }
+
+    @Override
     public void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
         super.saveAdditional(tag,registries);
         ContainerHelper.saveAllItems(tag, this.goodInventory.getItems(), registries);
@@ -120,6 +126,8 @@ public class TradeBoxBlockEntity extends BlockEntity implements MenuProvider {
     @Override
     public void loadAdditional(@Nonnull CompoundTag tag, HolderLookup.Provider registries) {
         super.loadAdditional(tag,registries);
+        // чистим перед загрузкой — loadAllItems снятые предметы не убирает (см. стол)
+        this.goodInventory.clearContent();
         ContainerHelper.loadAllItems(tag, this.goodInventory.getItems(), registries);
         this.coolingTime = tag.getShort("CoolingTime");
         this.locationId = tag.getShort("LocationId");

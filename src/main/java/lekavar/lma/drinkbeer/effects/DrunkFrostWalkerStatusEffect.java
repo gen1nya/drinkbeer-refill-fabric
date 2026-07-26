@@ -40,12 +40,22 @@ public class DrunkFrostWalkerStatusEffect extends MobEffect {
         super(MobEffectCategory.BENEFICIAL, new Color(30, 144, 255, 255).getRGB());
     }
 
+    /**
+     * ФИКС ОТНОСИТЕЛЬНО АПСТРИМА: апстрим возвращает false, а с 1.20.5 возвращаемое
+     * значение означает «эффект ещё жив». false → MobEffectInstance#tick сразу зовёт
+     * removeEffect, и «пьяный мороз» снимался на первом же тике (в active_effects
+     * оставался только drinkbeer:drunk, добавленный из onEffectAdded). Баг не наш,
+     * на NeoForge ломается так же.
+     * <p>
+     * ReplaceDisk#apply второй параметр (EnchantedItemInUse) не использует — проверено
+     * по байткоду 1.21.1, поэтому null здесь безопасен.
+     */
     @Override
     public boolean applyEffectTick(@NotNull LivingEntity entity, int amplifier) {
         if (entity instanceof Player && !entity.level().isClientSide()) {
             REPLACE_EFFECT.apply((ServerLevel) entity.level(), 1, null, entity, entity.position());
         }
-        return false;
+        return true;
     }
 
     @Override

@@ -58,11 +58,6 @@ public class MixedBeerBlockEntity extends BlockEntity {
     }
 
     @Override
-    public void handleUpdateTag(CompoundTag tag, HolderLookup.Provider registries) {
-        super.handleUpdateTag(tag,registries); // will directly call load()
-    }
-
-    @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
         CompoundTag tag = super.getUpdateTag(registries);
         saveAdditional(tag,registries);
@@ -82,11 +77,6 @@ public class MixedBeerBlockEntity extends BlockEntity {
 
     public int getBeerId() {
         return beerId;
-    }
-
-    @Override
-    public void onDataPacket(Connection net, ClientboundBlockEntityDataPacket pkt, HolderLookup.Provider registries) {
-        handleUpdateTag(pkt.getTag(),registries);
     }
 
     @Nullable

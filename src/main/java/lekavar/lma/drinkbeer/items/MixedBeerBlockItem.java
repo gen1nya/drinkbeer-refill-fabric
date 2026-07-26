@@ -7,6 +7,8 @@ import lekavar.lma.drinkbeer.utils.beer.Beers;
 import lekavar.lma.drinkbeer.utils.dataComponent.SpiceData;
 import lekavar.lma.drinkbeer.utils.mixedbeer.Flavors;
 import lekavar.lma.drinkbeer.utils.mixedbeer.Spices;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.Style;
@@ -26,8 +28,8 @@ public class MixedBeerBlockItem extends BeerBlockItem {
     public MixedBeerBlockItem(Block block) {
         super(block, new Item.Properties().stacksTo(1)
                 .food(new FoodProperties.Builder().alwaysEdible().build())
-                .component(DataComponentTypeRegistry.BEER_ID_COMPONENT, 1)
-                .component(DataComponentTypeRegistry.SPICE_COMPONENT, new SpiceData(Spices.EMPTY_SPICE_ID,Spices.EMPTY_SPICE_ID,Spices.EMPTY_SPICE_ID)));
+                .component(DataComponentTypeRegistry.BEER_ID_COMPONENT.get(), 1)
+                .component(DataComponentTypeRegistry.SPICE_COMPONENT.get(), new SpiceData(Spices.EMPTY_SPICE_ID,Spices.EMPTY_SPICE_ID,Spices.EMPTY_SPICE_ID)));
     }
 
     public void appendMixedBeerTooltip(ItemStack stack, List<Component> tooltip) {
@@ -36,9 +38,13 @@ public class MixedBeerBlockItem extends BeerBlockItem {
         //Base beer
         int beerId = MixedBeerManager.getBeerId(stack);
         Item beerItem = Beers.byId(beerId).getBeerItem();
-        String beerName = beerId > Beers.EMPTY_BEER_ID ? "block.drinkbeer." + beerItem.toString()
+        // Ключи берём у самого предмета: NeoForge патчит Item#toString() до path реестра,
+        // а ванильный toString() отдаёт полный id ("drinkbeer:beer_mug"), из-за чего
+        // получались ключи вида "block.drinkbeer.drinkbeer:beer_mug".
+        String beerName = beerId > Beers.EMPTY_BEER_ID ? beerItem.getDescriptionId()
                 : MixedBeerManager.getUnmixedToolTipTranslationKey();
-        String beerTooltip = beerId > Beers.EMPTY_BEER_ID ? "item.drinkbeer." + beerItem + ".tooltip"
+        String beerTooltip = beerId > Beers.EMPTY_BEER_ID
+                ? "item.drinkbeer." + BuiltInRegistries.ITEM.getKey(beerItem).getPath() + ".tooltip"
                 : "";
 
         tooltip.add(Component.translatable(beerName).setStyle(Style.EMPTY.applyFormat(ChatFormatting.BLUE)));
@@ -50,7 +56,7 @@ public class MixedBeerBlockItem extends BeerBlockItem {
         }
         //Base food level
         if (beerId > Beers.EMPTY_BEER_ID) {
-            String hunger = Integer.toString(beerItem.getFoodProperties(stack,null).nutrition());
+            String hunger = Integer.toString(beerItem.components().get(DataComponents.FOOD).nutrition());
             tooltip.add(Component.translatable("drinkbeer.restores_hunger").setStyle(Style.EMPTY.applyFormat(ChatFormatting.BLUE)).append(hunger));
         }
 
@@ -89,8 +95,10 @@ public class MixedBeerBlockItem extends BeerBlockItem {
     public Component getMixedBeerName(ItemStack stack) {
         int beerId = MixedBeerManager.getBeerId(stack);
         Item beerItem = Beers.byId(beerId).getBeerItem();
-        String beerName = beerId > Beers.EMPTY_BEER_ID ? "block.drinkbeer." + beerItem.toString() : "block.drinkbeer.empty_beer_mug";
-        Component name = Component.translatable(beerName).append(Component.translatable("block.drinkbeer." + MixedBeerManager.getMixedBeerTranslationKey())).setStyle(Style.EMPTY.applyFormat(ChatFormatting.YELLOW));
+        String beerName = beerId > Beers.EMPTY_BEER_ID ? beerItem.getDescriptionId() : "block.drinkbeer.empty_beer_mug";
+        Component name = Component.translatable(beerName)
+                .append(Component.translatable(MixedBeerManager.getMixedBeerTranslationKey()))
+                .setStyle(Style.EMPTY.applyFormat(ChatFormatting.YELLOW));
         return name;
     }
 
@@ -117,7 +125,7 @@ public class MixedBeerBlockItem extends BeerBlockItem {
     }
 
     public static int getBeerId(ItemStack itemStack) {
-        return itemStack.get(DataComponentTypeRegistry.BEER_ID_COMPONENT);
+        return itemStack.get(DataComponentTypeRegistry.BEER_ID_COMPONENT.get());
     }
 
     @Override

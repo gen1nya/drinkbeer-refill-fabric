@@ -86,7 +86,7 @@ public class TradeboxBlock extends BaseEntityBlock {
         if (!level.isClientSide) {
             level.playSound(null, pos, SoundEventRegistry.TRADEBOX_OPEN.get(), SoundSource.BLOCKS, 0.6f, 1f);
             BlockEntity blockentity = level.getBlockEntity(pos);
-            player.openMenu((TradeBoxBlockEntity) blockentity, buf -> buf.writeBlockPos(blockentity.getBlockPos()));
+            player.openMenu((TradeBoxBlockEntity) blockentity);
 
             return InteractionResult.CONSUME;
         }
