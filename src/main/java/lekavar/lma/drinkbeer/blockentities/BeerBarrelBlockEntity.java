@@ -16,6 +16,7 @@ import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.ContainerHelper;
+import net.minecraft.world.Containers;
 import net.minecraft.world.MenuProvider;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
@@ -91,9 +92,7 @@ public class BeerBarrelBlockEntity extends BlockEntity implements ExtendedScreen
                     displayResult(recipe, recipeInput);
                     if (recipe.isCupQualified(recipeInput)) {
                         for (int i = 0; i < 4; i++) {
-                            ItemStack ingred = brewingInventory.getItem(i);
-                            if (shouldReturnBucket(ingred)) brewingInventory.setItem(i, Items.BUCKET.getDefaultInstance());
-                            else brewingInventory.setItem(i, ItemStack.EMPTY);
+                            consumeIngredient(i);
                         }
                         brewingInventory.getItem(4).shrink(recipe.getRequiredCupCount());
                         remainingBrewTime = recipe.getBrewingTime();
@@ -125,6 +124,39 @@ public class BeerBarrelBlockEntity extends BlockEntity implements ExtendedScreen
 
     private boolean canBrew(@Nullable BrewingRecipe recipe, IBrewingInventory recipeInput) {
         return recipe.matches(recipeInput, this.level);
+    }
+
+    /**
+     * ФИКС ОТНОСИТЕЛЬНО АПСТРИМА: апстрим стирал слот ингредиента целиком
+     * ({@code setItem(i, EMPTY)}, а для ведра {@code setItem(i, BUCKET)}), поэтому
+     * положенный в слот стак пропадал ради одного нужного рецепту предмета, а стак ведёр
+     * с водой превращался в одно пустое ведро. Рецепт расходует ровно по одному предмету
+     * на слот (те «три пшеницы» — это три отдельных слота), столько и снимаем.
+     */
+    private void consumeIngredient(int slot) {
+        ItemStack ingredient = brewingInventory.getItem(slot);
+        if (ingredient.isEmpty()) {
+            return;
+        }
+        boolean returnsBucket = shouldReturnBucket(ingredient);
+
+        ingredient.shrink(1);
+        if (ingredient.isEmpty()) {
+            brewingInventory.setItem(slot, ItemStack.EMPTY);
+        }
+        if (!returnsBucket) {
+            return;
+        }
+
+        ItemStack emptyBucket = Items.BUCKET.getDefaultInstance();
+        if (brewingInventory.getItem(slot).isEmpty()) {
+            brewingInventory.setItem(slot, emptyBucket);
+        } else {
+            // Ванильные ведра нештабелируемые, так что сюда попасть нельзя; ветка —
+            // страховка на случай модового ведра с maxStackSize > 1, чтобы пустое не пропало.
+            Containers.dropItemStack(level, worldPosition.getX() + 0.5, worldPosition.getY() + 1.0,
+                    worldPosition.getZ() + 0.5, emptyBucket);
+        }
     }
 
     private boolean shouldReturnBucket(ItemStack item) {
