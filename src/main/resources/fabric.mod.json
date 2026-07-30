@@ -2,8 +2,8 @@
   "schemaVersion": 1,
   "id": "drinkbeer",
   "version": "${version}",
-  "name": "DrinkBeer Refill (Fabric)",
-  "description": "Brewing, Bartering and Bartending. Unofficial Fabric port of DrinkBeer Refill (NeoForge) with upstream bugfixes and an EMI plugin.",
+  "name": "Drink Beer Rebrew",
+  "description": "Brewing, Bartering and Bartending. Unofficial Fabric port of Drink Beer Refill (NeoForge, archived) with upstream bugfixes and an EMI plugin.",
   "authors": [
     "Lekavar",
     "MarbleGateKeeper",
