@@ -33,7 +33,9 @@ import java.util.List;
 public class MixedBeerBlockItem extends BeerBlockItem {
     public MixedBeerBlockItem(ResourceKey<Item> key, Block block) {
         super(block, new Item.Properties().useBlockDescriptionPrefix().setId(key).stacksTo(1)
-                .food(new FoodProperties.Builder().alwaysEdible().build())
+                // коктейль — питьё: звук с 1.21.2 живёт в компоненте Consumable,
+                // апстримовский BeerBlockItem#getEatingSound больше не вызывается
+                .food(new FoodProperties.Builder().alwaysEdible().build(), BeerMugItem.drinkWithEffect(null))
                 .component(DataComponentTypeRegistry.BEER_ID_COMPONENT.get(), 1)
                 .component(DataComponentTypeRegistry.SPICE_COMPONENT.get(), new SpiceData(Spices.EMPTY_SPICE_ID,Spices.EMPTY_SPICE_ID,Spices.EMPTY_SPICE_ID)));
     }

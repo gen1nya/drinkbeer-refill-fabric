@@ -10,6 +10,8 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.core.registries.Registries;
 
@@ -25,10 +27,21 @@ import java.util.List;
 
 public class SpiceBlockItem extends BlockItem {
     public SpiceBlockItem(ResourceKey<Item> key, Block block, @Nullable MobEffectInstance statusEffectInstance, int hunger) {
-        super(block, new Item.Properties().useBlockDescriptionPrefix().setId(key).stacksTo(64)
-                .food(new FoodProperties.Builder().nutrition(hunger).alwaysEdible().build(),
-                        BeerMugItem.drinkWithEffect(statusEffectInstance))
-        );
+        super(block, properties(key, statusEffectInstance, hunger));
+    }
+
+    /**
+     * С 1.21.2 эффекты еды живут в компоненте CONSUMABLE. Специя — еда, а не питьё:
+     * без эффекта отдаём ванильный дефолт (анимация EAT + generic_eat), иначе она
+     * жевалась бы со звуком питья пива.
+     */
+    private static Item.Properties properties(ResourceKey<Item> key, @Nullable MobEffectInstance effect, int hunger) {
+        Item.Properties props = new Item.Properties().useBlockDescriptionPrefix().setId(key).stacksTo(64);
+        FoodProperties food = new FoodProperties.Builder().nutrition(hunger).alwaysEdible().build();
+        return effect == null
+                ? props.food(food)
+                : props.food(food, Consumable.builder()
+                        .onConsume(new ApplyStatusEffectsConsumeEffect(effect, 1.0F)).build());
     }
 
 

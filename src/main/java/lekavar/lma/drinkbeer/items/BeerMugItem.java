@@ -52,7 +52,8 @@ public class BeerMugItem extends BeerBlockItem {
 
     public BeerMugItem(ResourceKey<Item> key, Block block, int nutrition, boolean hasExtraTooltip) {
         super(block, new Item.Properties().useBlockDescriptionPrefix().setId(key).stacksTo(16)
-                .food(new FoodProperties.Builder().nutrition(nutrition).alwaysEdible().build()));
+                .food(new FoodProperties.Builder().nutrition(nutrition).alwaysEdible().build(),
+                        drinkWithEffect(null)));
         this.hasExtraTooltip = hasExtraTooltip;
     }
 
