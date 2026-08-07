@@ -2,7 +2,7 @@ package lekavar.lma.drinkbeer.registries;
 
 import lekavar.lma.drinkbeer.DrinkBeer;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.sounds.SoundEvent;
 import lekavar.lma.drinkbeer.fabric.DeferredRegister;
 
@@ -27,6 +27,6 @@ public class SoundEventRegistry {
 
 
     private static Supplier<SoundEvent> register(String name) {
-        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(ResourceLocation.fromNamespaceAndPath(DrinkBeer.MOD_ID, name)));
+        return SOUNDS.register(name, () -> SoundEvent.createVariableRangeEvent(Identifier.fromNamespaceAndPath(DrinkBeer.MOD_ID, name)));
     }
 }

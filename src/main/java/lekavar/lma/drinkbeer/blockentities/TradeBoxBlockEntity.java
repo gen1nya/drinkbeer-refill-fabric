@@ -19,6 +19,8 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.state.BlockState;
 import org.jetbrains.annotations.NotNull;
 
@@ -114,25 +116,25 @@ public class TradeBoxBlockEntity extends BlockEntity implements ExtendedScreenHa
     }
 
     @Override
-    public void saveAdditional(@NotNull CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag,registries);
-        ContainerHelper.saveAllItems(tag, this.goodInventory.getItems(), registries);
-        tag.putShort("CoolingTime", (short) this.coolingTime);
-        tag.putShort("LocationId", (short) this.locationId);
-        tag.putShort("ResidentId", (short) this.residentId);
-        tag.putShort("Process", (short) this.process);
+    public void saveAdditional(@NotNull ValueOutput output) {
+        super.saveAdditional(output);
+        ContainerHelper.saveAllItems(output, this.goodInventory.getItems());
+        output.putShort("CoolingTime", (short) this.coolingTime);
+        output.putShort("LocationId", (short) this.locationId);
+        output.putShort("ResidentId", (short) this.residentId);
+        output.putShort("Process", (short) this.process);
     }
 
     @Override
-    public void loadAdditional(@Nonnull CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag,registries);
+    public void loadAdditional(@Nonnull ValueInput input) {
+        super.loadAdditional(input);
         // чистим перед загрузкой — loadAllItems снятые предметы не убирает (см. стол)
         this.goodInventory.clearContent();
-        ContainerHelper.loadAllItems(tag, this.goodInventory.getItems(), registries);
-        this.coolingTime = tag.getShort("CoolingTime");
-        this.locationId = tag.getShort("LocationId");
-        this.residentId = tag.getShort("ResidentId");
-        this.process = tag.getShort("Process");
+        ContainerHelper.loadAllItems(input, this.goodInventory.getItems());
+        this.coolingTime = input.getShortOr("CoolingTime", (short) 0);
+        this.locationId = input.getShortOr("LocationId", (short) 0);
+        this.residentId = input.getShortOr("ResidentId", (short) 0);
+        this.process = input.getShortOr("Process", (short) 0);
     }
 
     public static void tick(Level world, BlockPos pos, BlockState state, TradeBoxBlockEntity tradeboxEntity) {

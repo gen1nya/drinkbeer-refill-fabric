@@ -25,16 +25,16 @@ public class DrinkBeerCodes {
     public final static Codec<Ingredient> INGREDIENT_COMPAT_CODEC = new Codec<>() {
         @Override
         public <T> DataResult<Pair<Ingredient, T>> decode(DynamicOps<T> ops, T input) {
-            DataResult<Pair<Ingredient, T>> vanilla = Ingredient.CODEC_NONEMPTY.decode(ops, input);
+            DataResult<Pair<Ingredient, T>> vanilla = Ingredient.CODEC.decode(ops, input);
             if (vanilla.result().isPresent()) {
                 return vanilla;
             }
-            return toVanillaForm(ops, input).flatMap(converted -> Ingredient.CODEC_NONEMPTY.decode(ops, converted));
+            return toVanillaForm(ops, input).flatMap(converted -> Ingredient.CODEC.decode(ops, converted));
         }
 
         @Override
         public <T> DataResult<T> encode(Ingredient input, DynamicOps<T> ops, T prefix) {
-            return Ingredient.CODEC_NONEMPTY.encode(input, ops, prefix);
+            return Ingredient.CODEC.encode(input, ops, prefix);
         }
     };
 

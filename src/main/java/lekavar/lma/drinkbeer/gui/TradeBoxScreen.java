@@ -15,7 +15,7 @@ import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -25,9 +25,9 @@ import net.minecraft.world.phys.HitResult;
 import java.awt.*;
 
 public class TradeBoxScreen extends AbstractContainerScreen<TradeBoxMenu> {
-    private static final ResourceLocation TRADE_BOX_GUI = ResourceLocation.fromNamespaceAndPath(DrinkBeer.MOD_ID, "textures/gui/container/trade_box.png");
-    private static final ResourceLocation REFRESH_WIDGET = ResourceLocation.fromNamespaceAndPath(DrinkBeer.MOD_ID, "container/reroll");
-    private static final ResourceLocation REFRESH_WIDGET_BLUE = ResourceLocation.fromNamespaceAndPath(DrinkBeer.MOD_ID, "container/reroll_blue");
+    private static final Identifier TRADE_BOX_GUI = Identifier.fromNamespaceAndPath(DrinkBeer.MOD_ID, "textures/gui/container/trade_box.png");
+    private static final Identifier REFRESH_WIDGET = Identifier.fromNamespaceAndPath(DrinkBeer.MOD_ID, "container/reroll");
+    private static final Identifier REFRESH_WIDGET_BLUE = Identifier.fromNamespaceAndPath(DrinkBeer.MOD_ID, "container/reroll_blue");
     private static final WidgetSprites REFRESH_WIDGET_SPRITE = new WidgetSprites(REFRESH_WIDGET,REFRESH_WIDGET_BLUE);
     private final int textureWidth = 176;
     private final int textureHeight = 166;

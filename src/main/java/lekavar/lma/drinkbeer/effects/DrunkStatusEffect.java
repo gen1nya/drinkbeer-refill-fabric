@@ -78,14 +78,14 @@ public class DrunkStatusEffect extends MobEffect {
     private void giveHarmfulStatusEffects(LivingEntity entity, int amplifier, int time) {
         if (amplifier >= MAX_DRUNK_AMPLIFIER) {
             int duration = entity.getEffect(MobEffectRegistry.DRUNK).getDuration();
-            entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, duration, 0, false, visible));
-            entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, duration, MAX_DRUNK_AMPLIFIER - 1, false, visible));
+            entity.addEffect(new MobEffectInstance(MobEffects.NAUSEA, duration, 0, false, visible));
+            entity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, duration, MAX_DRUNK_AMPLIFIER - 1, false, visible));
         } else if (time % harmulStatusEffectsIntervals[amplifier] == 0) {
             int nauseaDuration = nauseaDurations[amplifier];
             int slownessDuration = slownessDurations[amplifier];
-            entity.addEffect(new MobEffectInstance(MobEffects.CONFUSION, nauseaDuration, 0, false, visible));
+            entity.addEffect(new MobEffectInstance(MobEffects.NAUSEA, nauseaDuration, 0, false, visible));
             if (amplifier > 0) {
-                entity.addEffect(new MobEffectInstance(MobEffects.MOVEMENT_SLOWDOWN, slownessDuration, amplifier - 1, false, visible));
+                entity.addEffect(new MobEffectInstance(MobEffects.SLOWNESS, slownessDuration, amplifier - 1, false, visible));
             }
         }
     }

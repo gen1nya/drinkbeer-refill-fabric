@@ -21,6 +21,8 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.core.Direction;
 import net.minecraft.world.WorldlyContainer;
@@ -114,9 +116,9 @@ public class BartendingTableBlockEntity extends BlockEntity implements WorldlyCo
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag,registries);
-        ContainerHelper.saveAllItems(tag, this.inv.getItems(), true, registries);
+    public void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        ContainerHelper.saveAllItems(output, this.inv.getItems(), true);
     }
 
     /**
@@ -128,10 +130,10 @@ public class BartendingTableBlockEntity extends BlockEntity implements WorldlyCo
      * невозможно взять»: кружка остаётся нарисованной, хотя на сервере её уже нет.
      */
     @Override
-    public void loadAdditional(@Nonnull CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag,registries);
+    public void loadAdditional(@Nonnull ValueInput input) {
+        super.loadAdditional(input);
         this.inv.clearContent();
-        ContainerHelper.loadAllItems(tag, this.inv.getItems(), registries);
+        ContainerHelper.loadAllItems(input, this.inv.getItems());
     }
 
     // ─── Автоматизация ──────────────────────────────────────────────────────────

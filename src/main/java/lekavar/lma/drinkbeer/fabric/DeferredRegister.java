@@ -4,7 +4,7 @@ import net.minecraft.core.Holder;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceKey;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 
 import java.util.function.Supplier;
 
@@ -40,8 +40,8 @@ public class DeferredRegister<T> {
         return new DeferredRegister<>(registry, namespace);
     }
 
-    public ResourceLocation id(String name) {
-        return ResourceLocation.fromNamespaceAndPath(namespace, name);
+    public Identifier id(String name) {
+        return Identifier.fromNamespaceAndPath(namespace, name);
     }
 
     public <R extends T> Supplier<R> register(String name, Supplier<? extends R> supplier) {

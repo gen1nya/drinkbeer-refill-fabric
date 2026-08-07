@@ -12,7 +12,6 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.ItemInteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -28,7 +27,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.phys.BlockHitResult;
@@ -39,7 +38,7 @@ import javax.annotation.Nullable;
 
 public class BartendingTableBlock extends BaseEntityBlock {
     public static final MapCodec<BartendingTableBlock> CODEC = simpleCodec(pro->new BartendingTableBlock());
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty OPENED = BooleanProperty.create("opened");
     public static final IntegerProperty TYPE = IntegerProperty.create("type", 1, 2);
 
@@ -105,11 +104,11 @@ public class BartendingTableBlock extends BaseEntityBlock {
                 }
             }
         }
-        return InteractionResult.sidedSuccess(world.isClientSide);
+        return InteractionResult.SUCCESS;
     }
 
     @Override
-    protected ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+    protected InteractionResult useItemOn(ItemStack stack, BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
         ItemStack inHand = player.getItemInHand(hand);
         boolean handledItem = inHand.getItem() instanceof MixedBeerBlockItem
                 || inHand.getItem() instanceof BeerMugItem
@@ -119,7 +118,7 @@ public class BartendingTableBlock extends BaseEntityBlock {
             // PASS_TO_DEFAULT_BLOCK_INTERACTION переходит к useWithoutItem. Апстрим
             // возвращал здесь CONSUME для ЛЮБОГО предмета, включая пустую руку, поэтому
             // клик съедался и забрать кружку со стола было невозможно в принципе.
-            return ItemInteractionResult.PASS_TO_DEFAULT_BLOCK_INTERACTION;
+            return InteractionResult.TRY_WITH_EMPTY_HAND;
         }
         if (!world.isClientSide()) {
             ItemStack itemStack = inHand;
@@ -134,7 +133,7 @@ public class BartendingTableBlock extends BaseEntityBlock {
                         if (!player.getAbilities().instabuild)
                             itemStack.shrink(1);
                     }
-                    return ItemInteractionResult.CONSUME;
+                    return InteractionResult.CONSUME;
                 } else if (itemStack.getItem() instanceof SpiceBlockItem) {
                     var placeIn = itemStack.copy();
                     placeIn.setCount(1);
@@ -145,10 +144,10 @@ public class BartendingTableBlock extends BaseEntityBlock {
                             itemStack.shrink(1);
                     }
                 }
-                return ItemInteractionResult.CONSUME;
+                return InteractionResult.CONSUME;
             }
         }
-        return ItemInteractionResult.sidedSuccess(world.isClientSide);
+        return InteractionResult.SUCCESS;
     }
 
     @Override

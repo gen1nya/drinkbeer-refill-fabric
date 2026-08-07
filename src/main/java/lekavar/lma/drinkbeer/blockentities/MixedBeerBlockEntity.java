@@ -12,6 +12,8 @@ import net.minecraft.network.Connection;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.state.BlockState;
 
 import javax.annotation.Nonnull;
@@ -38,24 +40,22 @@ public class MixedBeerBlockEntity extends BlockEntity {
      * @see MixedBeerManager#genMixedBeerItemStack(int, List)
      */
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag,registries);
+    public void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
 
-        CompoundTag descriptorTag = new CompoundTag();
-        descriptorTag.putInt("beerId", getBeerId());
-        descriptorTag.putIntArray("spiceList", getSpiceList());
-
-        tag.put("MixedBeer", descriptorTag);
+        ValueOutput descriptor = output.child("MixedBeer");
+        descriptor.putInt("beerId", getBeerId());
+        descriptor.putIntArray("spiceList", getSpiceList().stream().mapToInt(Integer::intValue).toArray());
     }
 
     @Override
-    public void loadAdditional(@Nonnull CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag,registries);
+    public void loadAdditional(@Nonnull ValueInput input) {
+        super.loadAdditional(input);
 
-        CompoundTag descriptorTag = tag.getCompound("MixedBeer");
-        this.beerId = descriptorTag.getShort("beerId");
+        ValueInput descriptor = input.childOrEmpty("MixedBeer");
+        this.beerId = descriptor.getIntOr("beerId", 0);
         this.spiceList.clear();
-        for (int spice : descriptorTag.getIntArray("spiceList")) {
+        for (int spice : descriptor.getIntArray("spiceList").orElse(new int[0])) {
             this.spiceList.add(spice);
         }
     }

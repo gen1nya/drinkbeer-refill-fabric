@@ -20,7 +20,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
@@ -31,7 +31,7 @@ import javax.annotation.Nullable;
 import java.util.Random;
 
 public class SpiceBlock extends HalfTransparentBlock {
-    public static final DirectionProperty FACING = BlockStateProperties.HORIZONTAL_FACING;
+    public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public final static VoxelShape DEFAULT_SHAPE = box(5.5, 0, 5.5, 10.5, 2, 10.5);
     public final static VoxelShape SPICE_FROZEN_PERSIMMON_SHAPE = box(5.5, 0, 5.5, 10.5, 3.5, 10.5);
     public final static VoxelShape SPICE_DRIED_SELAGINELLA = box(5.5, 0, 5.5, 10.5, 4.5, 10.5);
@@ -59,7 +59,7 @@ public class SpiceBlock extends HalfTransparentBlock {
 
     @Override
     protected InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-        if (level.isClientSide) {
+        if (level.isClientSide()) {
             SimpleParticleType particle = Spices.byItem(this.asItem()).getFlavor().getParticle();
             double x = (double) pos.getX() + 0.5D;
             double y = (double) pos.getY() + 0.3D + new Random().nextDouble() / 4;
@@ -68,7 +68,7 @@ public class SpiceBlock extends HalfTransparentBlock {
                 level.addParticle(particle, x, y, z, 0.0D, 0.0D, 0.0D);
             }
         }
-        return InteractionResult.sidedSuccess(level.isClientSide);
+        return InteractionResult.SUCCESS;
     }
 
     @Override

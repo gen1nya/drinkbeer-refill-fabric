@@ -3,7 +3,7 @@ package lekavar.lma.drinkbeer.registries;
 import lekavar.lma.drinkbeer.DrinkBeer;
 import lekavar.lma.drinkbeer.recipes.BrewingRecipe;
 import net.minecraft.core.registries.Registries;
-import net.minecraft.resources.ResourceLocation;
+import net.minecraft.resources.Identifier;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
 import lekavar.lma.drinkbeer.fabric.DeferredRegister;

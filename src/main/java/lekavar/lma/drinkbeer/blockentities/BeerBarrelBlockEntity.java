@@ -26,10 +26,11 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
-import net.minecraft.world.item.MilkBucketItem;
 import net.minecraft.world.item.crafting.RecipeHolder;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.storage.ValueInput;
+import net.minecraft.world.level.storage.ValueOutput;
 import net.minecraft.world.level.block.state.BlockState;
 import net.fabricmc.fabric.api.screenhandler.v1.ExtendedScreenHandlerFactory;
 import net.minecraft.core.Direction;
@@ -82,7 +83,7 @@ public class BeerBarrelBlockEntity extends BlockEntity implements ExtendedScreen
         if (statusCode == 0) {
             if (brewingInventory.getIngredients().size() == 4) {
                 IBrewingInventory recipeInput = new BrewingRecipeInput(brewingInventory);
-                RecipeHolder<BrewingRecipe> recipeholder = level.getRecipeManager().getRecipeFor(RecipeRegistry.RECIPE_TYPE_BREWING.get(), recipeInput, this.level).orElse(null);
+                RecipeHolder<BrewingRecipe> recipeholder = level.recipeAccess().getRecipeFor(RecipeRegistry.RECIPE_TYPE_BREWING.get(), recipeInput, this.level).orElse(null);
                 if (recipeholder==null) {
                     clearResult();
                     return;
@@ -160,7 +161,7 @@ public class BeerBarrelBlockEntity extends BlockEntity implements ExtendedScreen
     }
 
     private boolean shouldReturnBucket(ItemStack item) {
-        return item.getItem() instanceof BucketItem || item.getItem() instanceof MilkBucketItem;
+        return item.getItem() instanceof BucketItem || item.is(Items.MILK_BUCKET);
     }
 
     private void clearResult() {
@@ -192,21 +193,21 @@ public class BeerBarrelBlockEntity extends BlockEntity implements ExtendedScreen
     }
 
     @Override
-    public void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
-        super.saveAdditional(tag,registries);
-        ContainerHelper.saveAllItems(tag,brewingInventory.getItems(),registries);
-        tag.putInt("RemainingBrewTime", this.remainingBrewTime);
-        tag.putInt("statusCode", this.statusCode);
+    public void saveAdditional(ValueOutput output) {
+        super.saveAdditional(output);
+        ContainerHelper.saveAllItems(output, brewingInventory.getItems());
+        output.putInt("RemainingBrewTime", this.remainingBrewTime);
+        output.putInt("statusCode", this.statusCode);
     }
 
     @Override
-    public void loadAdditional(@Nonnull CompoundTag tag, HolderLookup.Provider registries) {
-        super.loadAdditional(tag,registries);
-        this.remainingBrewTime = tag.getInt("RemainingBrewTime");
-        this.statusCode = tag.getInt("statusCode");
+    public void loadAdditional(@Nonnull ValueInput input) {
+        super.loadAdditional(input);
+        this.remainingBrewTime = input.getIntOr("RemainingBrewTime", 0);
+        this.statusCode = input.getIntOr("statusCode", 0);
         // чистим перед загрузкой — loadAllItems снятые предметы не убирает (см. стол)
         brewingInventory.clearContent();
-        ContainerHelper.loadAllItems(tag, brewingInventory.getItems(),registries);
+        ContainerHelper.loadAllItems(input, brewingInventory.getItems());
     }
 
     @Override
