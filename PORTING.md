@@ -6,7 +6,8 @@
 - remote апстрима **удалён** из репозитория: тянуть оттуда больше нечего (см. «Происхождение и лицензия»).
   История до точки форка сохранена локально: `/home/evg/projects/drinkbeer-upstream-archive/`
   (bundle + bare-репозиторий + оба текста лицензии + `PROVENANCE.md` с хешами)
-- рабочая ветка: `fabric-1.21.1`
+- **ветка на версию игры**: `fabric-1.21.1` (наш сервер), `fabric-1.21.11` — см.
+  «Ветка 1.21.11» в конце файла. Фиксы портируются черри-пиком между ветками.
 - база порта: upstream `f3b2bfb` (версия 1.2.0)
 - лицензия: **AGPL-3.0-only** — при раздаче jar исходники должны быть доступны
 
@@ -266,3 +267,74 @@ EMI берётся с maven Modrinth (`maven.modrinth:emi:1.1.24+1.21.1+fabric` 
 на столе и поставленного коктейля, партиклы, тултипы, питьё и эффекты, EMI-категория «Варка».
 Прошло на сборке `1.2.0-fabric.12`; часть багов апстрима (№3, 4, 6, 7) нашлась именно здесь,
 консолью их не воспроизвести.
+
+## Ветка 1.21.11
+
+Отдельная ветка `fabric-1.21.11` (`mod_version=1.3.0-fabric.N`, fabric-api 0.141.6+1.21.11,
+loader в `depends` ≥0.18.0). EMI-плагина здесь **нет** — EMI под 1.21.11 не собран, вместо
+него в перспективе JEI (27.22.0.64). Что пришлось переделать против 1.21.1:
+
+**Реестры.** С 1.21.2 у каждого блока/предмета обязателен id *до* конструирования, иначе
+`NullPointerException: Block id not set` при первой же регистрации. В `fabric/DeferredRegister`
+добавлена перегрузка, отдающая фабрике готовый ключ:
+
+```java
+public <R extends T> Supplier<R> register(String name, Function<ResourceKey<T>, ? extends R> factory) {
+    ResourceKey<T> key = ResourceKey.create(registry.key(), id(name));
+    R value = factory.apply(key);
+    Registry.register(registry, key, value);
+    return () -> value;
+}
+```
+
+Все 42 блока и 42 предмета переписаны на `key -> new X(settings().setId(key))`; у предметов
+дополнительно `.useBlockDescriptionPrefix()`. Отсюда же требование к блокам иметь
+`public static BlockBehaviour.Properties settings()` + конструктор от `Properties`
+и `simpleCodec(X::new)`.
+
+`SpiceBlock` раньше выбирал `VoxelShape`, сравнивая `this` с полями `BlockRegistry` — теперь
+это статическая инициализация внутри самой регистрации (`SPICE_… is null`), форма передаётся
+конструктором.
+
+**Модели предметов.** Плоские `models/item/*.json` больше не подхватываются: нужны
+data-driven определения `assets/drinkbeer/items/*.json` (42 шт., сгенерированы). Кастомный
+предикат `beer_id` переехал с `ItemProperties` на `RangeSelectItemModelProperty`:
+
+```java
+public record BeerIdProperty() implements RangeSelectItemModelProperty { … }
+RangeSelectItemModelProperties.ID_MAPPER.put(
+        Identifier.fromNamespaceAndPath(MOD_ID, "beer_id"), BeerIdProperty.MAP_CODEC);
+```
+
+`items/mixed_beer.json` — `minecraft:range_dispatch` по `drinkbeer:beer_id` с 9 порогами
+и generic-фолбэком.
+
+**Рендер block entity.** Архитектура render state: `createRenderState`/`extractRenderState`/
+`submit` вместо прямого рисования. Стейты в `client/renderers/DrinkBeerRenderStates`, стопка
+пива — `ItemStackRenderState`:
+
+```java
+itemModelResolver.updateForTopItem(state.beer, stack, ItemDisplayContext.GROUND, level, null, 0); // extract
+state.beer.submit(poseStack, collector, state.lightAbove, OverlayTexture.NO_OVERLAY, 0);          // submit
+```
+
+**Прочие миграции API.** `ResourceLocation`→`Identifier`; `DirectionProperty`→
+`EnumProperty<Direction>`; `ItemInteractionResult` схлопнут в `InteractionResult`
+(+`TRY_WITH_EMPTY_HAND`); NBT block entity — `ValueInput`/`ValueOutput`, `getUpdateTag` →
+`saveCustomOnly(registries)`; эффекты еды — `Consumable`/`ConsumeEffect`; `appendHoverText`
+получил `TooltipDisplay` и `Consumer<Component>`; `onRemove`→`affectNeighborsAfterRemoval`;
+`updateShape` с `ScheduledTickAccess`; `blit(RenderPipelines.GUI_TEXTURED, …)`;
+у `Recipe` появились `placementInfo()` (у нас `PlacementInfo.NOT_PLACEABLE`) и
+`recipeBookCategory()`.
+
+**Рецепты.** 7 ванильных крафтов переведены на строковую форму ингредиентов; в
+`INGREDIENT_COMPAT_CODEC` добавлен разворот тега внутри NeoForge-овского `alternatives`
+в обычный `#tag` — иначе 1.21.11 не парсит и рецепты молча не грузятся.
+
+**Ловушка теста, не мода.** С 1.21.2 в server.properties есть `pause-when-empty-seconds`
+(по умолчанию 60): сервер **без игроков замирает через минуту**, block entity перестают
+тикать. В таком мире кег «не варит» без единой ошибки в логе. В `tools/prod-test.sh`
+выставлено `pause-when-empty-seconds=0` — `forceload` этого не лечит.
+
+Сценарии A–F на собранном jar 1.21.11: зелёные, исключений в логе нет. Клиентская часть
+(рендер стола/коктейля, GUI, тултипы) на 1.21.11 вживую ещё не проверялась.

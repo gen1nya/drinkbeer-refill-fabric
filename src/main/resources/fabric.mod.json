@@ -3,7 +3,7 @@
   "id": "drinkbeer",
   "version": "${version}",
   "name": "Drink Beer Rebrew",
-  "description": "Brewing, Bartering and Bartending. Unofficial Fabric port of Drink Beer Refill (NeoForge) forked at commit f3b2bfb under AGPL-3.0, with upstream bugfixes and an EMI plugin.",
+  "description": "Brewing, Bartering and Bartending. Unofficial Fabric port of Drink Beer Refill (NeoForge) forked at commit f3b2bfb under AGPL-3.0, with upstream bugfixes.",
   "authors": [
     "Lekavar",
     "MarbleGateKeeper",
