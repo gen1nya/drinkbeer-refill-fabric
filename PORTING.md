@@ -1,13 +1,27 @@
 # Fabric-порт DrinkBeer Refill
 
-Форк [DragonsPlusMinecraft/DrinkBeerRefill](https://github.com/DragonsPlusMinecraft/DrinkBeerRefill)
-(ветка `1.21.1`, NeoForge) → Fabric 1.21.1.
+Форк [DragonsPlusMinecraft/DrinkBeerRefill](https://github.com/DragonsPlusMinecraft/DrinkBeerRefill/tree/f3b2bfb)
+(NeoForge) → Fabric 1.21.1. **Точка форка запинена коммитом `f3b2bfb`** — см. ниже.
 
 - upstream remote: `upstream` (`git fetch upstream 1.21.1`)
 - рабочая ветка: `fabric-1.21.1`
 - база порта: upstream `f3b2bfb` (версия 1.2.0)
-- лицензия: **AGPL-3.0-only** (как у апстрима и у оригинала Lekavar/DrinkBeer) — при раздаче
-  jar исходники должны быть доступны
+- лицензия: **AGPL-3.0-only** — при раздаче jar исходники должны быть доступны
+
+## Происхождение и лицензия
+
+Все ссылки на апстрим в репозитории **ведут на коммит `f3b2bfb`**, а не на ветку, и это
+сознательно: 2026-08-07 апстрим выпустил `1.4.0-beta.1` и **тем же коммитом**
+([`8130c4c`](https://github.com/DragonsPlusMinecraft/DrinkBeerRefill/commit/8130c4c)) заменил текст AGPL-3.0 на All Rights Reserved. В том же
+релизе они добавили собственную поддержку Fabric, то есть официальная Fabric-сборка
+*Drink Beer Refill* теперь существует.
+
+На нас это не распространяется: мы форкнулись от состояния под AGPL-3.0
+([LICENSE на f3b2bfb](https://github.com/DragonsPlusMinecraft/DrinkBeerRefill/blob/f3b2bfb/LICENSE)), а AGPL-3.0 §2 говорит, что права даются
+на срок действия авторского права и «irrevocable provided the stated conditions are met».
+Перелицензирование действует на их новую работу, а не задним числом на уже опубликованное.
+⛔ **Код из коммитов апстрима после `f3b2bfb` не используется и браться не будет**, пока
+лицензия там такая; смерджить их фиксы к себе мы больше не можем.
 
 ## Принцип
 

@@ -3,7 +3,7 @@
   "id": "drinkbeer",
   "version": "${version}",
   "name": "Drink Beer Rebrew",
-  "description": "Brewing, Bartering and Bartending. Unofficial Fabric port of Drink Beer Refill (NeoForge, archived) with upstream bugfixes and an EMI plugin.",
+  "description": "Brewing, Bartering and Bartending. Unofficial Fabric port of Drink Beer Refill (NeoForge) forked at commit f3b2bfb under AGPL-3.0, with upstream bugfixes and an EMI plugin.",
   "authors": [
     "Lekavar",
     "MarbleGateKeeper",
@@ -13,8 +13,9 @@
     "gen1nya (Fabric port)"
   ],
   "contact": {
+    "homepage": "https://modrinth.com/mod/drink-beer-rebrew",
     "sources": "https://github.com/gen1nya/drinkbeer-refill-fabric",
-    "homepage": "https://github.com/DragonsPlusMinecraft/DrinkBeerRefill"
+    "issues": "https://github.com/gen1nya/drinkbeer-refill-fabric/issues"
   },
   "license": "AGPL-3.0-only",
   "icon": "icon.png",
