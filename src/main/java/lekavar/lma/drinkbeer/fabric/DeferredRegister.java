@@ -33,7 +33,7 @@ public class DeferredRegister<T> {
 
     @SuppressWarnings("unchecked")
     public static <T> DeferredRegister<T> create(ResourceKey<? extends Registry<T>> key, String namespace) {
-        Registry<T> registry = (Registry<T>) BuiltInRegistries.REGISTRY.get(key.identifier());
+        Registry<T> registry = (Registry<T>) BuiltInRegistries.REGISTRY.getValue(key.identifier());
         if (registry == null) {
             throw new IllegalStateException("Нет встроенного реестра " + key.identifier());
         }

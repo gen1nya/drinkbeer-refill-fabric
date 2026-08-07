@@ -51,9 +51,9 @@ public class DrunkFrostWalkerStatusEffect extends MobEffect {
      * по байткоду 1.21.1, поэтому null здесь безопасен.
      */
     @Override
-    public boolean applyEffectTick(@NotNull LivingEntity entity, int amplifier) {
-        if (entity instanceof Player && !entity.level().isClientSide()) {
-            REPLACE_EFFECT.apply((ServerLevel) entity.level(), 1, null, entity, entity.position());
+    public boolean applyEffectTick(@NotNull ServerLevel level, @NotNull LivingEntity entity, int amplifier) {
+        if (entity instanceof Player) {
+            REPLACE_EFFECT.apply(level, 1, null, entity, entity.position());
         }
         return true;
     }

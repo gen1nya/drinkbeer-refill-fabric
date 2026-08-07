@@ -110,9 +110,8 @@ public class BartendingTableBlockEntity extends BlockEntity implements WorldlyCo
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = super.getUpdateTag(registries);
-        ContainerHelper.saveAllItems(tag, this.inv.getItems(), true, registries);
-        return tag;
+        // см. кег: снимок BE вместо ручной сборки тега
+        return saveCustomOnly(registries);
     }
 
     @Override

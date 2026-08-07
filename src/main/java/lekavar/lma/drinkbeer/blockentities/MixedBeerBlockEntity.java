@@ -4,6 +4,7 @@ import lekavar.lma.drinkbeer.managers.MixedBeerManager;
 import lekavar.lma.drinkbeer.registries.BlockEntityRegistry;
 import lekavar.lma.drinkbeer.registries.DataComponentTypeRegistry;
 import lekavar.lma.drinkbeer.utils.dataComponent.SpiceData;
+import net.minecraft.core.component.DataComponentGetter;
 import net.minecraft.core.component.DataComponentMap;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
@@ -62,10 +63,8 @@ public class MixedBeerBlockEntity extends BlockEntity {
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = super.getUpdateTag(registries);
-        saveAdditional(tag,registries);
-
-        return tag;
+        // saveAdditional пишет в ValueOutput, поэтому берём готовый снимок BE
+        return saveCustomOnly(registries);
     }
 
     public ItemStack getPickStack() {
@@ -95,7 +94,7 @@ public class MixedBeerBlockEntity extends BlockEntity {
      * данные приезжают из компонентов предмета и сами уходят клиенту.
      */
     @Override
-    protected void applyImplicitComponents(DataComponentInput input) {
+    protected void applyImplicitComponents(DataComponentGetter input) {
         super.applyImplicitComponents(input);
 
         Integer id = input.get(DataComponentTypeRegistry.BEER_ID_COMPONENT.get());

@@ -12,6 +12,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
@@ -58,7 +59,7 @@ public class MixedBeerBlock extends BaseEntityBlock {
     }
 
     @Override
-    public void onRemove(BlockState state, Level world, BlockPos pos, BlockState newState, boolean moved) {
+    public void affectNeighborsAfterRemoval(BlockState state, ServerLevel world, BlockPos pos, boolean moved) {
         MixedBeerBlockEntity te = (MixedBeerBlockEntity) world.getBlockEntity(pos);
         if (te != null) {
             ItemStack mixedBeerItemStack = te.getPickStack();
@@ -66,7 +67,7 @@ public class MixedBeerBlock extends BaseEntityBlock {
         } else {
             System.out.println("Something goes wrong with dropping mixed beer item stack!");
         }
-        super.onRemove(state, world, pos, newState, moved);
+        super.affectNeighborsAfterRemoval(state, world, pos, moved);
     }
 
     @Override

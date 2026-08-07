@@ -1,6 +1,6 @@
 package lekavar.lma.drinkbeer.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.renderer.RenderPipelines;
 import lekavar.lma.drinkbeer.DrinkBeer;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -27,10 +27,10 @@ public class BeerBarrelScreen extends AbstractContainerScreen<BeerBarrelMenu> {
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        RenderSystem.setShaderTexture(0, BEER_BARREL_CONTAINER_RESOURCE);
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
-        guiGraphics.blit(BEER_BARREL_CONTAINER_RESOURCE, i, j, 0, 0, imageWidth, imageHeight);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BEER_BARREL_CONTAINER_RESOURCE, i, j, 0.0F, 0.0F,
+                imageWidth, imageHeight, textureWidth, textureHeight);
     }
 
     @Override

@@ -14,10 +14,10 @@ import java.util.function.Supplier;
 
 public class BlockEntityRegistry {
     public static final DeferredRegister<BlockEntityType<?>> BLOKC_ENTITIES = DeferredRegister.create(Registries.BLOCK_ENTITY_TYPE, DrinkBeer.MOD_ID);
-    public static final Supplier<BlockEntityType<BeerBarrelBlockEntity>> BEER_BARREL_TILEENTITY = BLOKC_ENTITIES.register("beer_barrel_blockentity", () -> BlockEntityType.Builder.of(BeerBarrelBlockEntity::new, BlockRegistry.BEER_BARREL.get()).build(null));
-    public static final Supplier<BlockEntityType<BartendingTableBlockEntity>> BARTENDING_TABLE_TILEENTITY = BLOKC_ENTITIES.register("bartending_table_normal_blockentity", () -> BlockEntityType.Builder.of(BartendingTableBlockEntity::new, BlockRegistry.BARTENDING_TABLE.get()).build(null));
-    public static final Supplier<BlockEntityType<TradeBoxBlockEntity>> TRADE_BOX_TILEENTITY = BLOKC_ENTITIES.register("trade_box_normal_blockentity", () -> BlockEntityType.Builder.of(TradeBoxBlockEntity::new, BlockRegistry.TRADE_BOX.get()).build(null));
-    public static final Supplier<BlockEntityType<MixedBeerBlockEntity>> MIXED_BEER_TILEENTITY = BLOKC_ENTITIES.register("mixed_beer_blockentity", () -> BlockEntityType.Builder.of(MixedBeerBlockEntity::new, BlockRegistry.MIXED_BEER.get()).build(null));
+    public static final Supplier<BlockEntityType<BeerBarrelBlockEntity>> BEER_BARREL_TILEENTITY = BLOKC_ENTITIES.register("beer_barrel_blockentity", () -> FabricBlockEntityTypeBuilder.create(BeerBarrelBlockEntity::new, BlockRegistry.BEER_BARREL.get()).build());
+    public static final Supplier<BlockEntityType<BartendingTableBlockEntity>> BARTENDING_TABLE_TILEENTITY = BLOKC_ENTITIES.register("bartending_table_normal_blockentity", () -> FabricBlockEntityTypeBuilder.create(BartendingTableBlockEntity::new, BlockRegistry.BARTENDING_TABLE.get()).build());
+    public static final Supplier<BlockEntityType<TradeBoxBlockEntity>> TRADE_BOX_TILEENTITY = BLOKC_ENTITIES.register("trade_box_normal_blockentity", () -> FabricBlockEntityTypeBuilder.create(TradeBoxBlockEntity::new, BlockRegistry.TRADE_BOX.get()).build());
+    public static final Supplier<BlockEntityType<MixedBeerBlockEntity>> MIXED_BEER_TILEENTITY = BLOKC_ENTITIES.register("mixed_beer_blockentity", () -> FabricBlockEntityTypeBuilder.create(MixedBeerBlockEntity::new, BlockRegistry.MIXED_BEER.get()).build());
 
     // Рендереры блок-энтити регистрируются в DrinkBeerClient (Fabric: клиентский entrypoint,
     // а не EntityRenderersEvent).

@@ -11,6 +11,9 @@ import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.component.TooltipDisplay;
+import java.util.function.Consumer;
+import java.util.ArrayList;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.block.Block;
 
@@ -20,15 +23,16 @@ import java.util.List;
 public class SpiceBlockItem extends BlockItem {
     public SpiceBlockItem(Block block, @Nullable MobEffectInstance statusEffectInstance, int hunger) {
         super(block, new Item.Properties().stacksTo(64)
-                .food(statusEffectInstance != null
-                        ? new FoodProperties.Builder().nutrition(hunger).effect(statusEffectInstance, 1).alwaysEdible().build()
-                        : new FoodProperties.Builder().nutrition(hunger).alwaysEdible().build())
+                .food(new FoodProperties.Builder().nutrition(hunger).alwaysEdible().build(),
+                        BeerMugItem.drinkWithEffect(statusEffectInstance))
         );
     }
 
 
     @Override
-    public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+    public void appendHoverText(ItemStack stack, TooltipContext context, TooltipDisplay display,
+                                Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag) {
+        List<Component> tooltipComponents = new ArrayList<>();
         //Spice title
         tooltipComponents.add(Component.translatable(SpiceAndFlavorManager.getSpiceToolTipTranslationKey()).setStyle(Style.EMPTY.applyFormat(ChatFormatting.YELLOW)));
         //Flavor title

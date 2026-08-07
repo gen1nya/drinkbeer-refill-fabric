@@ -1,6 +1,6 @@
 package lekavar.lma.drinkbeer.gui;
 
-import com.mojang.blaze3d.systems.RenderSystem;
+import net.minecraft.client.renderer.RenderPipelines;
 import lekavar.lma.drinkbeer.DrinkBeer;
 import lekavar.lma.drinkbeer.blocks.TradeboxBlock;
 import lekavar.lma.drinkbeer.managers.TradeBoxManager;
@@ -11,7 +11,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.components.ImageButton;
 import net.minecraft.client.gui.components.WidgetSprites;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.locale.Language;
 import net.minecraft.network.chat.Component;
@@ -43,24 +42,21 @@ public class TradeBoxScreen extends AbstractContainerScreen<TradeBoxMenu> {
 
     @Override
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
-        RenderSystem.setShader(GameRenderer::getPositionTexShader);
-        RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
-        RenderSystem.setShaderTexture(0, TRADE_BOX_GUI);
         int backgroundWidth = this.imageWidth;
         int backgroundHeight = this.imageHeight;
         int x = (this.width - backgroundWidth) / 2;
         int y = (this.height - backgroundHeight) / 2;
 
-        guiGraphics.blit(TRADE_BOX_GUI, x, y, 0, 0, backgroundWidth, backgroundHeight);
+        guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TRADE_BOX_GUI, x, y, 0, 0, backgroundWidth, backgroundHeight, 256, 256);
         if (container.isCooling()) {
-            guiGraphics.blit(TRADE_BOX_GUI, x + 84, y + 25, 178, 38, 72, 36);
+            guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TRADE_BOX_GUI, x + 84, y + 25, 178, 38, 72, 36, 256, 256);
             String timeStr = Convert.tickToTime(container.getCoolingTime());
             guiGraphics.drawString(font, timeStr, x + 114, y + 39, new Color(64, 64, 64, 255).getRGB());
         } else if (container.isTrading()) {
             if (isHovering(157, 6, 13, 13, (double) mouseX, (double) mouseY)) {
-                guiGraphics.blit(TRADE_BOX_GUI, x + 155, y + 4, 178, 19, 16, 16);
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TRADE_BOX_GUI, x + 155, y + 4, 178, 19, 16, 16, 256, 256);
             } else {
-                guiGraphics.blit(TRADE_BOX_GUI, x + 155, y + 4, 178, 0, 16, 16);
+                guiGraphics.blit(RenderPipelines.GUI_TEXTURED, TRADE_BOX_GUI, x + 155, y + 4, 178, 0, 16, 16, 256, 256);
             }
         }
         if (!container.isCooling()) {

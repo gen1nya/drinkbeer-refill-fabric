@@ -5,6 +5,7 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectCategory;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.effect.MobEffects;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.LivingEntity;
 
 import java.awt.*;
@@ -59,7 +60,7 @@ public class DrunkStatusEffect extends MobEffect {
     }
 
     @Override
-    public boolean applyEffectTick(LivingEntity entity, int amplifier) {
+    public boolean applyEffectTick(ServerLevel level, LivingEntity entity, int amplifier) {
         int time = entity.getEffect(MobEffectRegistry.DRUNK).getDuration();
         //Always give harmful status effects
         giveHarmfulStatusEffects(entity, amplifier, time);

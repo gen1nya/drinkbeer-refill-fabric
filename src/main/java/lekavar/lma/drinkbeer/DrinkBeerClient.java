@@ -15,7 +15,6 @@ import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.particle.FlameParticle;
 import net.minecraft.client.particle.HeartParticle;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
-import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.Identifier;
 
 public class DrinkBeerClient implements ClientModInitializer {
@@ -31,7 +30,8 @@ public class DrinkBeerClient implements ClientModInitializer {
         MenuScreens.register(MenuTypeRegistry.beerBarrelContainer.get(), BeerBarrelScreen::new);
         MenuScreens.register(MenuTypeRegistry.tradeBoxContainer.get(), TradeBoxScreen::new);
 
-        ItemProperties.register(ItemRegistry.MIXED_BEER.get(), Identifier.withDefaultNamespace("beer_id"),
-                (stack, level, living, id) -> MixedBeerManager.getBeerId(stack) / 100.0f);
+        // ItemProperties вырезан в 1.21.4: вид коктейля задаётся декларативной item-моделью
+        // (assets/drinkbeer/items/mixed_beer.json) со своим числовым свойством drinkbeer:beer_id,
+        // которое регистрируется в RangeSelectItemModelProperties.ID_MAPPER — см. PORTING-1.21.11.
     }
 }

@@ -306,9 +306,8 @@ public class BeerBarrelBlockEntity extends BlockEntity implements ExtendedScreen
 
     @Override
     public CompoundTag getUpdateTag(HolderLookup.Provider registries) {
-        CompoundTag tag = super.getUpdateTag(registries);
-        ContainerHelper.saveAllItems(tag,brewingInventory.getItems(),registries);
-        return tag;
+        // saveAdditional пишет в ValueOutput, поэтому клиенту отдаём готовый снимок BE
+        return saveCustomOnly(registries);
     }
 
     /**

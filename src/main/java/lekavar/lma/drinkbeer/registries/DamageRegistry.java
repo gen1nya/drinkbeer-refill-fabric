@@ -14,6 +14,6 @@ public class DamageRegistry {
 
     public static DamageSource alcohol(RegistryAccess access) {
         return new DamageSource(
-                access.lookupOrThrow(Registries.DAMAGE_TYPE).getHolderOrThrow(ALCOHOL));
+                access.lookupOrThrow(Registries.DAMAGE_TYPE).getOrThrow(ALCOHOL));
     }
 }
