@@ -37,15 +37,20 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 
 public class BartendingTableBlock extends BaseEntityBlock {
-    public static final MapCodec<BartendingTableBlock> CODEC = simpleCodec(pro->new BartendingTableBlock());
+    public static final MapCodec<BartendingTableBlock> CODEC = simpleCodec(BartendingTableBlock::new);
     public static final EnumProperty<Direction> FACING = BlockStateProperties.HORIZONTAL_FACING;
     public static final BooleanProperty OPENED = BooleanProperty.create("opened");
     public static final IntegerProperty TYPE = IntegerProperty.create("type", 1, 2);
 
     public final static VoxelShape SHAPE = Block.box(0, 0.01, 0, 16, 16, 16);
 
-    public BartendingTableBlock() {
-        super(BlockBehaviour.Properties.of().ignitedByLava().mapColor(MapColor.WOOD).strength(2.0f).noOcclusion());
+    /** Дефолтные свойства блока: с 1.21.2 id должен быть выставлен до конструктора. */
+    public static BlockBehaviour.Properties settings() {
+        return BlockBehaviour.Properties.of().ignitedByLava().mapColor(MapColor.WOOD).strength(2.0f).noOcclusion();
+    }
+
+    public BartendingTableBlock(BlockBehaviour.Properties properties) {
+        super(properties);
         this.registerDefaultState(this.defaultBlockState()
                 .setValue(FACING, Direction.NORTH)
                 .setValue(OPENED, true)

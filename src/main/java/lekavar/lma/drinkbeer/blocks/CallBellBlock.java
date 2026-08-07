@@ -18,6 +18,7 @@ import net.minecraft.world.level.ScheduledTickAccess;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
@@ -32,8 +33,13 @@ public class CallBellBlock extends Block {
 
     public final static VoxelShape SHAPE = Block.box(5.5f, 0, 5.5f, 10.5f, 4, 10.5f);
 
-    public CallBellBlock() {
-        super(Properties.of().mapColor(MapColor.METAL).strength(1.0f).pushReaction(PushReaction.DESTROY));
+    /** Дефолтные свойства блока: с 1.21.2 id должен быть выставлен до конструктора. */
+    public static BlockBehaviour.Properties settings() {
+        return Properties.of().mapColor(MapColor.METAL).strength(1.0f).pushReaction(PushReaction.DESTROY);
+    }
+
+    public CallBellBlock(BlockBehaviour.Properties properties) {
+        super(properties);
     }
 
     @Override

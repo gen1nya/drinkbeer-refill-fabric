@@ -17,6 +17,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -40,8 +41,13 @@ public class BeerMugBlock extends Block {
             Block.box(1, 0, 1, 15, 6, 15)
     };
 
-    public BeerMugBlock() {
-        super(Properties.of().ignitedByLava().mapColor(MapColor.WOOD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY));
+    /** Дефолтные свойства блока: с 1.21.2 id должен быть выставлен до конструктора. */
+    public static BlockBehaviour.Properties settings() {
+        return Properties.of().ignitedByLava().mapColor(MapColor.WOOD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY);
+    }
+
+    public BeerMugBlock(BlockBehaviour.Properties properties) {
+        super(properties);
         this.registerDefaultState(
                 this.defaultBlockState().setValue(FACING, Direction.NORTH).setValue(AMOUNT, 1)
         );

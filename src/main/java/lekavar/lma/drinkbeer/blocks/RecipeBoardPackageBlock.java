@@ -14,6 +14,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -35,8 +36,13 @@ public class RecipeBoardPackageBlock extends Block {
     public final static VoxelShape N_S_SHAPE = Block.box(0, 1, 1, 16, 10, 15);
     public final static VoxelShape E_W_SHAPE = Block.box(1, 0, 0, 15, 10, 16);
 
-    public RecipeBoardPackageBlock() {
-        super(Properties.of().mapColor(MapColor.METAL).strength(1.0f).noOcclusion());
+    /** Дефолтные свойства блока: с 1.21.2 id должен быть выставлен до конструктора. */
+    public static BlockBehaviour.Properties settings() {
+        return Properties.of().mapColor(MapColor.METAL).strength(1.0f).noOcclusion();
+    }
+
+    public RecipeBoardPackageBlock(BlockBehaviour.Properties properties) {
+        super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
     }
 

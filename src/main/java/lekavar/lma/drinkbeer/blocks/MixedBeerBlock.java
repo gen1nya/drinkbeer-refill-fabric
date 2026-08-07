@@ -22,6 +22,7 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.MapColor;
 import net.minecraft.world.level.material.PushReaction;
@@ -32,11 +33,16 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import javax.annotation.Nullable;
 
 public class MixedBeerBlock extends BaseEntityBlock {
-    public final static MapCodec<MixedBeerBlock> CODEC = simpleCodec(pro->new MixedBeerBlock());
+    public final static MapCodec<MixedBeerBlock> CODEC = simpleCodec(MixedBeerBlock::new);
     public final static VoxelShape ONE_MUG_SHAPE = Block.box(4, 0, 4, 12, 6, 12);
 
-    public MixedBeerBlock() {
-        super(Properties.of().ignitedByLava().mapColor(MapColor.WOOD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY));
+    /** Дефолтные свойства блока: с 1.21.2 id должен быть выставлен до конструктора. */
+    public static BlockBehaviour.Properties settings() {
+        return Properties.of().ignitedByLava().mapColor(MapColor.WOOD).strength(1.0f).noOcclusion().pushReaction(PushReaction.DESTROY);
+    }
+
+    public MixedBeerBlock(BlockBehaviour.Properties properties) {
+        super(properties);
     }
 
     @Override

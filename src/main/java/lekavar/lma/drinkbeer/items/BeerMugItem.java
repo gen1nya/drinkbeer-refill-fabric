@@ -15,6 +15,9 @@ import net.minecraft.world.item.component.Consumable;
 import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
 
 import net.minecraft.world.item.Item;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.TooltipDisplay;
 import java.util.function.Consumer;
@@ -47,21 +50,21 @@ public class BeerMugItem extends BeerBlockItem {
     private final static double MAX_PLACE_DISTANCE = 2.0D;
     private final boolean hasExtraTooltip;
 
-    public BeerMugItem(Block block, int nutrition, boolean hasExtraTooltip) {
-        super(block, new Item.Properties().stacksTo(16)
+    public BeerMugItem(ResourceKey<Item> key, Block block, int nutrition, boolean hasExtraTooltip) {
+        super(block, new Item.Properties().useBlockDescriptionPrefix().setId(key).stacksTo(16)
                 .food(new FoodProperties.Builder().nutrition(nutrition).alwaysEdible().build()));
         this.hasExtraTooltip = hasExtraTooltip;
     }
 
-    public BeerMugItem(Block block, @Nullable MobEffectInstance statusEffectInstance, int nutrition, boolean hasExtraTooltip) {
-        super(block, new Item.Properties().stacksTo(16)
+    public BeerMugItem(ResourceKey<Item> key, Block block, @Nullable MobEffectInstance statusEffectInstance, int nutrition, boolean hasExtraTooltip) {
+        super(block, new Item.Properties().useBlockDescriptionPrefix().setId(key).stacksTo(16)
                 .food(new FoodProperties.Builder().nutrition(nutrition).alwaysEdible().build(),
                         drinkWithEffect(statusEffectInstance)));
         this.hasExtraTooltip = hasExtraTooltip;
     }
 
-    public BeerMugItem(Block block, Supplier<MobEffectInstance> statusEffectInstance, int nutrition, boolean hasExtraTooltip) {
-        super(block, new Item.Properties().stacksTo(16)
+    public BeerMugItem(ResourceKey<Item> key, Block block, Supplier<MobEffectInstance> statusEffectInstance, int nutrition, boolean hasExtraTooltip) {
+        super(block, new Item.Properties().useBlockDescriptionPrefix().setId(key).stacksTo(16)
                 .food(new FoodProperties.Builder().nutrition(nutrition).alwaysEdible().build(),
                         drinkWithEffect(statusEffectInstance == null ? null : statusEffectInstance.get())));
         this.hasExtraTooltip = hasExtraTooltip;

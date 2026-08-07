@@ -44,6 +44,17 @@ public class DeferredRegister<T> {
         return Identifier.fromNamespaceAndPath(namespace, name);
     }
 
+    /**
+     * С 1.21.2 блоки и предметы обязаны знать свой registry-key ДО вызова конструктора
+     * (иначе «Block id not set»), поэтому фабрике отдаётся готовый ключ.
+     */
+    public <R extends T> Supplier<R> register(String name, java.util.function.Function<ResourceKey<T>, ? extends R> factory) {
+        ResourceKey<T> key = ResourceKey.create(registry.key(), id(name));
+        R value = factory.apply(key);
+        Registry.register(registry, key, value);
+        return () -> value;
+    }
+
     public <R extends T> Supplier<R> register(String name, Supplier<? extends R> supplier) {
         R value = supplier.get();
         Registry.register(registry, id(name), value);

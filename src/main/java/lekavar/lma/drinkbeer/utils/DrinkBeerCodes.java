@@ -48,8 +48,18 @@ public class DrinkBeerCodes {
     private static <T> DataResult<T> toVanillaForm(DynamicOps<T> ops, T input) {
         var asList = ops.getStream(input).result();
         if (asList.isPresent()) {
+            // С 1.21.2 ванильный HolderSet-кодек не принимает тег ВНУТРИ списка альтернатив.
+            // У апстрима слот вида [{"item":"minecraft:wheat"},{"tag":"c:crops/wheat"}] — тег там
+            // и так покрывает предмет, поэтому при наличии тега отдаём только его.
+            List<T> elements = asList.get().toList();
+            for (T element : elements) {
+                var tagOnly = ops.get(element, "tag").flatMap(ops::getStringValue).result();
+                if (tagOnly.isPresent()) {
+                    return DataResult.success(ops.createString("#" + tagOnly.get()));
+                }
+            }
             List<T> converted = new ArrayList<>();
-            for (T element : asList.get().toList()) {
+            for (T element : elements) {
                 DataResult<T> single = toVanillaForm(ops, element);
                 if (single.result().isEmpty()) {
                     return single;

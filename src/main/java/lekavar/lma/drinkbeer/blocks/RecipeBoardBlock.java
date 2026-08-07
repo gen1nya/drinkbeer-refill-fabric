@@ -5,6 +5,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -25,8 +26,13 @@ public class RecipeBoardBlock extends Block {
     public final static VoxelShape EAST_SHAPE = Block.box(14.5, 0, 1, 16, 16, 15);
     public final static VoxelShape WEST_SHAPE = Block.box(0, 0, 1, 1.5, 16, 15);
 
-    public RecipeBoardBlock(boolean acquirableViaPackage) {
-        super(Properties.of().ignitedByLava().mapColor(MapColor.WOOD).strength(1.0f).noOcclusion());
+    /** Дефолтные свойства блока: с 1.21.2 id должен быть выставлен до конструктора. */
+    public static BlockBehaviour.Properties settings() {
+        return Properties.of().ignitedByLava().mapColor(MapColor.WOOD).strength(1.0f).noOcclusion();
+    }
+
+    public RecipeBoardBlock(BlockBehaviour.Properties properties, boolean acquirableViaPackage) {
+        super(properties);
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
         this.acquirableViaPackage = acquirableViaPackage;
     }

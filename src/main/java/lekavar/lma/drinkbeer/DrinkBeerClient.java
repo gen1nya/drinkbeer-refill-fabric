@@ -1,5 +1,7 @@
 package lekavar.lma.drinkbeer;
 
+import lekavar.lma.drinkbeer.client.model.BeerIdProperty;
+import net.minecraft.client.renderer.item.properties.numeric.RangeSelectItemModelProperties;
 import lekavar.lma.drinkbeer.client.renderers.BartendingTableBlockEntityRenderer;
 import lekavar.lma.drinkbeer.client.renderers.MixedBeerBlockEntityRenderer;
 import lekavar.lma.drinkbeer.gui.BeerBarrelScreen;
@@ -31,7 +33,8 @@ public class DrinkBeerClient implements ClientModInitializer {
         MenuScreens.register(MenuTypeRegistry.tradeBoxContainer.get(), TradeBoxScreen::new);
 
         // ItemProperties вырезан в 1.21.4: вид коктейля задаётся декларативной item-моделью
-        // (assets/drinkbeer/items/mixed_beer.json) со своим числовым свойством drinkbeer:beer_id,
-        // которое регистрируется в RangeSelectItemModelProperties.ID_MAPPER — см. PORTING-1.21.11.
+        // (assets/drinkbeer/items/mixed_beer.json), а своё числовое свойство кладётся сюда.
+        RangeSelectItemModelProperties.ID_MAPPER.put(
+                Identifier.fromNamespaceAndPath(DrinkBeer.MOD_ID, "beer_id"), BeerIdProperty.MAP_CODEC);
     }
 }

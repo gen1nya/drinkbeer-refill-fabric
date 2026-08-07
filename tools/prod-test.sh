@@ -11,9 +11,11 @@ set -euo pipefail
 
 REPO="$(cd "$(dirname "$0")/.." && pwd)"
 DIR="${1:-/tmp/drinkbeer-prodtest}"
-MC=1.21.1
-LOADER=0.19.3
-FABRIC_API_VERSION=0.116.12+1.21.1
+# версии берём из gradle.properties, чтобы харнесс не разъезжался с веткой
+prop() { grep -E "^$1=" "$REPO/gradle.properties" | cut -d= -f2-; }
+MC=$(prop minecraft_version)
+LOADER=$(prop loader_version)
+FABRIC_API_VERSION=$(prop fabric_version)
 
 JAR=$(ls -t "$REPO"/build/libs/drinkbeer-fabric-*.jar | head -1)
 [ -n "$JAR" ] || { echo "Нет собранного jar — сначала ./gradlew build"; exit 1; }
@@ -46,15 +48,21 @@ level-name=test
 max-tick-time=-1
 view-distance=6
 simulation-distance=6
+# 1.21.2+: без этого сервер замирает через 60 с без игроков и тесты «зависают» на статусе 0
+pause-when-empty-seconds=0
 PROPS
 rm -rf test
 
 echo "Тестируем $(basename "$JAR") в $DIR"
 
-# ВАЖНО: в мире без игроков чанки загружены, но НЕ тикают — отсюда forceload.
+# ВАЖНО: в мире без игроков чанки не тикают. С 1.21.2 тикет forceload держит чанк
+# загруженным, но НЕ тикающим (block entities молчат), поэтому тестовую площадку
+# делаем спавн-чанками: spawnChunkRadius тикает всегда, даже без игроков.
 {
   sleep 55
-  echo "forceload add 0 0 24 24"; sleep 3
+  echo "forceload add 0 0 24 24"
+  echo "setworldspawn 10 4 10"
+  echo "gamerule spawnChunkRadius 4"; sleep 3
   echo "setblock 10 4 10 drinkbeer:beer_barrel"; sleep 2
 
   echo "say ==== A: 4 мусорных слота (не должно быть краша) ===="

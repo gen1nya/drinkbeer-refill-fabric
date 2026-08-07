@@ -38,20 +38,31 @@ public class SpiceBlock extends HalfTransparentBlock {
     public final static VoxelShape SPICE_FROZEN_PERSIMMON_SHAPE = box(5.5, 0, 5.5, 10.5, 3.5, 10.5);
     public final static VoxelShape SPICE_DRIED_SELAGINELLA = box(5.5, 0, 5.5, 10.5, 4.5, 10.5);
 
-    public SpiceBlock() {
-        super(BlockBehaviour.Properties.of().ignitedByLava().mapColor(MapColor.WOOD).strength(1.0f).pushReaction(PushReaction.DESTROY));
+    /** Дефолтные свойства блока: с 1.21.2 id должен быть выставлен до конструктора. */
+    public static BlockBehaviour.Properties settings() {
+        return BlockBehaviour.Properties.of().ignitedByLava().mapColor(MapColor.WOOD).strength(1.0f).pushReaction(PushReaction.DESTROY);
+    }
+
+    private final VoxelShape shape;
+
+    public SpiceBlock(BlockBehaviour.Properties properties) {
+        this(properties, DEFAULT_SHAPE);
+    }
+
+    /**
+     * Форма приходит параметром, а не вычисляется сравнением с полями BlockRegistry:
+     * с 1.21.2 кеш форм строится ПРЯМО во время регистрации блока, когда часть полей
+     * реестра ещё null — так мод и падал на старте («SPICE_FROZEN_PERSIMMON is null»).
+     */
+    public SpiceBlock(BlockBehaviour.Properties properties, VoxelShape shape) {
+        super(properties);
+        this.shape = shape;
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.NORTH));
     }
 
     @Override
     public VoxelShape getShape(BlockState state, BlockGetter view, BlockPos pos, CollisionContext context) {
-        if (this.equals(BlockRegistry.SPICE_FROZEN_PERSIMMON.get())) {
-            return SPICE_FROZEN_PERSIMMON_SHAPE;
-        }
-        if (this.equals(BlockRegistry.SPICE_DRIED_SELAGINELLA.get())) {
-            return SPICE_DRIED_SELAGINELLA;
-        }
-        return DEFAULT_SHAPE;
+        return shape;
     }
 
     @Override

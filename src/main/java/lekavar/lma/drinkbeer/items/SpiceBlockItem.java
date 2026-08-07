@@ -10,6 +10,9 @@ import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.food.FoodProperties;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.core.registries.Registries;
+
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.component.TooltipDisplay;
 import java.util.function.Consumer;
@@ -21,8 +24,8 @@ import javax.annotation.Nullable;
 import java.util.List;
 
 public class SpiceBlockItem extends BlockItem {
-    public SpiceBlockItem(Block block, @Nullable MobEffectInstance statusEffectInstance, int hunger) {
-        super(block, new Item.Properties().stacksTo(64)
+    public SpiceBlockItem(ResourceKey<Item> key, Block block, @Nullable MobEffectInstance statusEffectInstance, int hunger) {
+        super(block, new Item.Properties().useBlockDescriptionPrefix().setId(key).stacksTo(64)
                 .food(new FoodProperties.Builder().nutrition(hunger).alwaysEdible().build(),
                         BeerMugItem.drinkWithEffect(statusEffectInstance))
         );
