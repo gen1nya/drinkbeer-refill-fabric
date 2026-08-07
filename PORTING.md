@@ -3,7 +3,9 @@
 Форк [DragonsPlusMinecraft/DrinkBeerRefill](https://github.com/DragonsPlusMinecraft/DrinkBeerRefill/tree/f3b2bfb)
 (NeoForge) → Fabric 1.21.1. **Точка форка запинена коммитом `f3b2bfb`** — см. ниже.
 
-- upstream remote: `upstream` (`git fetch upstream 1.21.1`)
+- remote апстрима **удалён** из репозитория: тянуть оттуда больше нечего (см. «Происхождение и лицензия»).
+  История до точки форка сохранена локально: `/home/evg/projects/drinkbeer-upstream-archive/`
+  (bundle + bare-репозиторий + оба текста лицензии + `PROVENANCE.md` с хешами)
 - рабочая ветка: `fabric-1.21.1`
 - база порта: upstream `f3b2bfb` (версия 1.2.0)
 - лицензия: **AGPL-3.0-only** — при раздаче jar исходники должны быть доступны
