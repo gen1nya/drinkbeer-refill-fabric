@@ -6,6 +6,7 @@ import lekavar.lma.drinkbeer.blockentities.BeerBarrelBlockEntity;
 import lekavar.lma.drinkbeer.blockentities.MixedBeerBlockEntity;
 import lekavar.lma.drinkbeer.blockentities.TradeBoxBlockEntity;
 import net.minecraft.core.registries.Registries;
+import net.fabricmc.fabric.api.object.builder.v1.block.entity.FabricBlockEntityTypeBuilder;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import lekavar.lma.drinkbeer.fabric.DeferredRegister;
 

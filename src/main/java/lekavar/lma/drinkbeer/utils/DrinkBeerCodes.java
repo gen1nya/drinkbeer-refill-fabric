@@ -12,6 +12,13 @@ import java.util.List;
 
 public class DrinkBeerCodes {
 
+    /** Ingredient.EMPTY в 1.21.11 убрали, поэтому список собираем сами. */
+    private static NonNullList<Ingredient> toNonNullList(List<Ingredient> list) {
+        NonNullList<Ingredient> result = NonNullList.createWithCapacity(list.size());
+        result.addAll(list);
+        return result;
+    }
+
     /**
      * Ингредиент в ванильном ИЛИ в NeoForge-формате.
      * <p>
@@ -66,13 +73,11 @@ public class DrinkBeerCodes {
     }
 
     public final static Codec<NonNullList<Ingredient>> NON_NULL_LIST_INGREDIENT_CODEC = INGREDIENT_COMPAT_CODEC.listOf().comapFlatMap((list) -> {
-        Ingredient[] allingredient = list.toArray(Ingredient[]::new);
-        return DataResult.success(NonNullList.of(Ingredient.EMPTY, allingredient));
+        return DataResult.success(toNonNullList(list));
     }, nonNullList -> nonNullList);
 
     public final static Codec<NonNullList<Ingredient>> NON_NULL_LIST_4_INGREDIENT_CODEC = INGREDIENT_COMPAT_CODEC.listOf().comapFlatMap((list) -> {
-        Ingredient[] allingredient = list.toArray(Ingredient[]::new);
-        if(allingredient.length!=4) return DataResult.error(()->"Must be 4 ingredients", NonNullList.of(Ingredient.EMPTY, allingredient));
-        return DataResult.success(NonNullList.of(Ingredient.EMPTY, allingredient));
+        if(list.size()!=4) return DataResult.error(()->"Must be 4 ingredients", toNonNullList(list));
+        return DataResult.success(toNonNullList(list));
     }, nonNullList -> nonNullList);
 }

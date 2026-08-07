@@ -15,6 +15,8 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.item.crafting.RecipeType;
+import net.minecraft.world.item.crafting.PlacementInfo;
+import net.minecraft.world.item.crafting.RecipeBookCategory;
 import net.minecraft.world.level.Level;
 
 import java.util.List;
@@ -39,7 +41,7 @@ public class BrewingRecipe implements Recipe<IBrewingInventory> {
         return result;
     }
 
-    @Override
+    /** Больше не метод интерфейса Recipe — оставляем как свой геттер (нужен JEI/EMI и матчингу). */
     public NonNullList<Ingredient> getIngredients() {
         NonNullList<Ingredient> result = NonNullList.create();
         result.addAll(input);
@@ -82,7 +84,6 @@ public class BrewingRecipe implements Recipe<IBrewingInventory> {
     }
 
     // Can Craft at any dimension
-    @Override
     public boolean canCraftInDimensions(int p_194133_1_, int p_194133_2_) {
         return true;
     }
@@ -92,7 +93,6 @@ public class BrewingRecipe implements Recipe<IBrewingInventory> {
      * If your recipe has more than one possible result (e.g. it's dynamic and depends on its inputs),
      * then return an empty stack.
      */
-    @Override
     public ItemStack getResultItem(HolderLookup.Provider provider) {
         //For Safety, I use #copy
         return result.copy();
@@ -106,18 +106,30 @@ public class BrewingRecipe implements Recipe<IBrewingInventory> {
         return result.copy();
     }
 
+    /** Рецепт варки не выкладывается в сетку крафта. */
+    @Override
+    public PlacementInfo placementInfo() {
+        return PlacementInfo.NOT_PLACEABLE;
+    }
+
+    /** Своя категория книги рецептов — ванильные все про крафт-сетку. */
+    @Override
+    public RecipeBookCategory recipeBookCategory() {
+        return RecipeRegistry.RECIPE_BOOK_CATEGORY_BREWING.get();
+    }
+
     @Override
     public boolean isSpecial() {
         return true;
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public RecipeSerializer<BrewingRecipe> getSerializer() {
         return RecipeRegistry.RECIPE_SERIALIZER_BREWING.get();
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public RecipeType<BrewingRecipe> getType() {
         return RecipeRegistry.RECIPE_TYPE_BREWING.get();
     }
 
@@ -146,8 +158,8 @@ public class BrewingRecipe implements Recipe<IBrewingInventory> {
 
         public static BrewingRecipe fromNetwork(RegistryFriendlyByteBuf packetBuffer) {
             int i = packetBuffer.readVarInt();
-            NonNullList<Ingredient> ingredients = NonNullList.withSize(i, Ingredient.EMPTY);
-            ingredients.replaceAll((_it) -> Ingredient.CONTENTS_STREAM_CODEC.decode(packetBuffer));
+            NonNullList<Ingredient> ingredients = NonNullList.createWithCapacity(i);
+            for (int slot = 0; slot < i; slot++) ingredients.add(Ingredient.CONTENTS_STREAM_CODEC.decode(packetBuffer));
             ItemStack cup = ItemStack.STREAM_CODEC.decode(packetBuffer);
             int brewingTime = packetBuffer.readVarInt();
             ItemStack result = ItemStack.STREAM_CODEC.decode(packetBuffer);

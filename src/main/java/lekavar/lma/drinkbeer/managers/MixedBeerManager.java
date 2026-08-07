@@ -18,7 +18,9 @@ import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.item.component.Consumable;
+import net.minecraft.world.item.consume_effects.ApplyStatusEffectsConsumeEffect;
+import net.minecraft.world.item.consume_effects.ConsumeEffect;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import org.apache.commons.lang3.tuple.Pair;
@@ -151,11 +153,15 @@ public class MixedBeerManager {
 
     private static List<Pair<MobEffect, Integer>> getBeerStatusEffectList(ItemStack stack, Level world) {
         List<Pair<MobEffect, Integer>> resultStatusEffectList = new ArrayList<>();
-        List<FoodProperties.PossibleEffect> possibleEffects = stack.get(DataComponents.FOOD).effects();
-        if (possibleEffects != null) {
-            if (!possibleEffects.isEmpty()) {
-                for (FoodProperties.PossibleEffect possibleEffect : possibleEffects)
-                    resultStatusEffectList.add(Pair.of(possibleEffect.effect().getEffect().value(),possibleEffect.effect().getDuration()));
+        // 1.21.2+: эффекты еды живут не в FOOD, а в компоненте CONSUMABLE как ConsumeEffect
+        Consumable consumable = stack.get(DataComponents.CONSUMABLE);
+        if (consumable != null) {
+            for (ConsumeEffect consumeEffect : consumable.onConsumeEffects()) {
+                if (consumeEffect instanceof ApplyStatusEffectsConsumeEffect applyEffects) {
+                    for (MobEffectInstance instance : applyEffects.effects()) {
+                        resultStatusEffectList.add(Pair.of(instance.getEffect().value(), instance.getDuration()));
+                    }
+                }
             }
         }
         if (stack.getItem().equals(Beers.BEER_MUG_NIGHT_HOWL_KVASS.getBeerItem())) {

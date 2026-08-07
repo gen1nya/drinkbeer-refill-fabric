@@ -83,7 +83,7 @@ public class BeerBarrelBlockEntity extends BlockEntity implements ExtendedScreen
         if (statusCode == 0) {
             if (brewingInventory.getIngredients().size() == 4) {
                 IBrewingInventory recipeInput = new BrewingRecipeInput(brewingInventory);
-                RecipeHolder<BrewingRecipe> recipeholder = level.recipeAccess().getRecipeFor(RecipeRegistry.RECIPE_TYPE_BREWING.get(), recipeInput, this.level).orElse(null);
+                RecipeHolder<BrewingRecipe> recipeholder = level.getServer().getRecipeManager().getRecipeFor(RecipeRegistry.RECIPE_TYPE_BREWING.get(), recipeInput, this.level).orElse(null);
                 if (recipeholder==null) {
                     clearResult();
                     return;
