@@ -29,8 +29,9 @@ public class BeerBarrelScreen extends AbstractContainerScreen<BeerBarrelMenu> {
     protected void renderBg(GuiGraphics guiGraphics, float partialTicks, int mouseX, int mouseY) {
         int i = (this.width - this.imageWidth) / 2;
         int j = (this.height - this.imageHeight) / 2;
+        // последняя пара — размер PNG (256×256), а не размер GUI: иначе фон рисуется увеличенным
         guiGraphics.blit(RenderPipelines.GUI_TEXTURED, BEER_BARREL_CONTAINER_RESOURCE, i, j, 0.0F, 0.0F,
-                imageWidth, imageHeight, textureWidth, textureHeight);
+                imageWidth, imageHeight, 256, 256);
     }
 
     @Override

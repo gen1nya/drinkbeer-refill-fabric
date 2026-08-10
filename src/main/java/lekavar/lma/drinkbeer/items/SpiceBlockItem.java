@@ -60,5 +60,6 @@ public class SpiceBlockItem extends BlockItem {
                 .append(Component.translatable(SpiceAndFlavorManager.getFlavorToolTipTranslationKey(flavors.getId())))
                 .append(")")
                 .setStyle(Style.EMPTY.applyFormat(ChatFormatting.RED)));
+        tooltipComponents.forEach(tooltipAdder);
     }
 }

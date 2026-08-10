@@ -123,6 +123,7 @@ public class MixedBeerBlockItem extends BeerBlockItem {
                                 Consumer<Component> tooltipAdder, TooltipFlag tooltipFlag) {
         List<Component> tooltipComponents = new ArrayList<>();
         appendMixedBeerTooltip(stack, tooltipComponents);
+        tooltipComponents.forEach(tooltipAdder);
     }
 
     @Override

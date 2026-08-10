@@ -90,6 +90,7 @@ public class BeerMugItem extends BeerBlockItem {
         }
         String hunger = String.valueOf(stack.get(DataComponents.FOOD).nutrition());
         tooltipComponents.add(Component.translatable("drinkbeer.restores_hunger").setStyle(Style.EMPTY.applyFormat(ChatFormatting.BLUE)).append(hunger));
+        tooltipComponents.forEach(tooltipAdder);
     }
 
     private boolean hasEffectNoticeTooltip() {
